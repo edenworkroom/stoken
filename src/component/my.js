@@ -31,7 +31,7 @@ class My extends Base {
                 tickets.push(key);
             });
 
-            if(tickets.length > 0) {
+            if (tickets.length > 0) {
                 pAbi.tokens(account.mainPKr, tickets, function (tokens) {
                     let update = false;
                     if (!self.state.tokens) {
@@ -161,6 +161,7 @@ class My extends Base {
                     {
                         text: 'Submit', onPress: () => {
                             let supply = new BigNumber(this.supplyValue.state.value).multipliedBy(new BigNumber(10).pow(opt.props.decimals));
+                            console.log("burning", supply, opt.props.token, catg, opt.props.ticket)
                             pAbi.burnToken(this.state.pk, this.state.mainPKr, supply.toNumber(), catg, opt.props.ticket);
                         }
                     },
@@ -207,6 +208,7 @@ class My extends Base {
                                                                           alt=""/>}
                                                                style={{whiteSpace: 'nowrap'}}>出售</Popover.Item>),
                                                 (<Popover.Item key="6" value="give" ticket={item.ticket}
+                                                               token={item.token}
                                                                icon={<img src={give} className="am-icon am-icon-xs"
                                                                           alt=""/>}
                                                                style={{whiteSpace: 'nowrap'}}>转让</Popover.Item>),

@@ -4,12 +4,12 @@ import BigNumber from 'bignumber.js'
 import {Toast} from "antd-mobile";
 
 const config = {
-    name: "Token Platform",
+    name: "S Token",
     contractAddress: "NONE",
-    github: "https://gitee.com/edenworkroom/coin-platform",
+    github: "https://gitee.com/edenworkroom/stoken",
     author: "edenworkroom@163.com",
     url: document.location.href,
-    logo: document.location.protocol + '//' + document.location.host + '/coin-platform/logo.png'
+    logo: document.location.protocol + '//' + document.location.host + '/stoken/logo.png'
 }
 
 class Abi {
@@ -44,9 +44,9 @@ class Abi {
                     tickets.set(item, "COIN");
                 });
             }
-            if (item.Tickets.has("COIN2")) {
-                item.Tickets.get("COIN2").forEach(item => {
-                    tickets.set(item, "COIN2");
+            if (item.Tickets.has("COIN3")) {
+                item.Tickets.get("COIN3").forEach(item => {
+                    tickets.set(item, "COIN3");
                 });
             }
             callback({pk: item.PK, mainPKr: item.MainPKr, name: item.Name, balances: item.Balance, tickets: tickets})
@@ -63,9 +63,9 @@ class Abi {
                         tickets.set(item, "COIN");
                     });
                 }
-                if (item.Tickets.has("COIN2")) {
-                    item.Tickets.get("COIN2").forEach(item => {
-                        tickets.set(item, "COIN2");
+                if (item.Tickets.has("COIN3")) {
+                    item.Tickets.get("COIN3").forEach(item => {
+                        tickets.set(item, "COIN3");
                     });
                 }
                 accounts.push({
@@ -127,7 +127,6 @@ class Abi {
             tkt: ticket
         };
 
-        console.log("estimateParam", estimateParam);
         seropp.estimateGas(estimateParam, function (gas, error) {
             if (error) {
                 Toast.fail("Failed to execute smart contract")
