@@ -150,11 +150,12 @@ class PlatformAbi extends Abi {
     tokens(from, tickets, callback) {
         this.callMethod(contract, "tokens", from, [tickets], function (json) {
             let tokens = JSON.parse(json);
-            tokens.sort(function (a, b) {
-                return a.token < b.token ? -1 : 1;
-            });
             tokens.forEach((item, index) => {
                 item.ticket = tickets[index];
+            });
+
+            tokens.sort(function (a, b) {
+                return a.token < b.token ? -1 : 1;
             });
             callback(tokens);
         });

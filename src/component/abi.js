@@ -127,6 +127,7 @@ class Abi {
             tkt: ticket
         };
 
+        console.log("estimateParam", estimateParam);
         seropp.estimateGas(estimateParam, function (gas, error) {
             if (error) {
                 Toast.fail("Failed to execute smart contract")

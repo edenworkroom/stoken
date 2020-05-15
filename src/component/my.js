@@ -81,8 +81,9 @@ class My extends Base {
             popoverVisible: false,
         });
         let catg = this.state.tickets.get(opt.props.ticket);
-
+        console.log("opt", opt);
         switch (opt.props.value) {
+
             case "auction":
                 break;
             case "sell":
@@ -199,7 +200,8 @@ class My extends Base {
                                                 (<Popover.Item key="4" value="auction" ticket={item.ticket}
                                                                disabled={true}
                                                                token={item.token}
-                                                               icon={<img src={auction} className="am-icon am-icon-xs"
+                                                               icon={<img src={auction}
+                                                                          className="am-icon am-icon-xs"
                                                                           alt=""/>}
                                                                data-seed="logId">拍卖</Popover.Item>),
                                                 (<Popover.Item key="5" value="sell" ticket={item.ticket}
@@ -214,7 +216,8 @@ class My extends Base {
                                                                style={{whiteSpace: 'nowrap'}}>转让</Popover.Item>),
                                                 (<Popover.Item key="7" value="transfer" ticket={item.ticket}
                                                                token={item.token} decimals={item.decimals}
-                                                               icon={<img src={transfer} className="am-icon am-icon-xs"
+                                                               icon={<img src={transfer}
+                                                                          className="am-icon am-icon-xs"
                                                                           alt=""/>}
                                                                style={{whiteSpace: 'nowrap'}}>转账</Popover.Item>),
                                                 (<Popover.Item key="8" value="issues" ticket={item.ticket}
@@ -226,7 +229,8 @@ class My extends Base {
                                                 </Popover.Item>),
                                                 (<Popover.Item key="1" value="burning" ticket={item.ticket}
                                                                token={item.token} decimals={item.decimals}
-                                                               icon={<img src={burning} className="am-icon am-icon-xs"
+                                                               icon={<img src={burning}
+                                                                          className="am-icon am-icon-xs"
                                                                           alt=""/>}>
                                                     <span style={{marginRight: 5}}>销毁</span>
                                                 </Popover.Item>),
