@@ -87,7 +87,7 @@ const abiJson = [{
     "name": "OwnershipTransferred",
     "type": "event"
 }];
-const caddress = "2SbsDYSRi1K6muMzxyP7K1FvmucYx1UAswLwkcvKrS4MsahYPa3EF4AQzVXci8cRXsb2WS771ZrCkYqGUpYXxC4C";
+const caddress = "4hCycuxTGDTScKLJAysnQci2U7q6Y1VeoBb4HXHX19Lv6YZWKnQbLyXGD6UynerCX8RqngwcAceJYkNbZo5PXq3f";
 const contract = serojs.callContract(abiJson, caddress);
 
 
@@ -95,7 +95,6 @@ class SellAbi extends Abi {
 
     sellTokens(from, start, end, callback) {
         super.callMethod(contract, "sellTokens", from, [start, end], function (json) {
-            console.log("tokens", json);
             callback(JSON.parse(json));
         });
     }

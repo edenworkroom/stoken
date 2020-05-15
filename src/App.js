@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import './App.css';
-import {TabBar, Modal, Carousel} from "antd-mobile";
+import {TabBar, Modal, Carousel, Flex, WingBlank, WhiteSpace, Button} from "antd-mobile";
 import home_0 from "./icon/home_0.png";
 import home_1 from "./icon/home_1.png";
 import Home from "./component/home";
@@ -10,9 +10,11 @@ import My from "./component/my";
 import help_0 from "./icon/help_0.png";
 import help_1 from "./icon/help_1.png";
 import Help from "./component/help";
-import pAbi from './component/platformabi';
-import {LoadContract} from "./component/tool/loadcontract";
-import {OpContract} from "./component/tool/opcontract";
+import language from "./component/language";
+import {showPK} from "./component/common";
+import Abi from "./component/abi";
+
+const abi = new Abi();
 
 const operation = Modal.operation;
 
@@ -20,32 +22,74 @@ class App extends Component {
 
     constructor(props) {
         super(props);
+
+        let self = this;
+        let pk = localStorage.getItem("PK");
         this.state = {
-            selectedTab: 'my'
+            selectedTab: 'my',
+            pk: pk,
         };
+
+        if (!pk) {
+            abi.init
+                .then(() => {
+                    abi.accountList(function (accounts) {
+                        self.setState({pk: accounts[0].pk, name: accounts[0].name});
+                        localStorage.setItem("PK", accounts[0].pk);
+                        return;
+                    });
+                })
+        }
     }
 
-    // changAccount() {
-    //     let self = this;
-    //     pAbi.init
-    //         .then(() => {
-    //             pAbi.accountList(function (accounts) {
-    //                 let actions = [];
-    //                 accounts.forEach(function (account, index) {
-    //                     actions.push(
-    //                         {
-    //                             text: <span>{account.name + ":" + self.showPK(account.pk)}</span>, onPress: () => {
-    //                                 self.setState({pk: account.pk});
-    //                                 localStorage.setItem("PK", account.pk);
-    //                             }
-    //                         }
-    //                     );
-    //                 });
-    //                 operation(actions);
-    //             });
-    //         })
-    // }
+    changAccount() {
+        let self = this;
+        abi.init
+            .then(() => {
+                abi.accountList(function (accounts) {
+                    let actions = [];
+                    accounts.forEach(function (account, index) {
+                        actions.push(
+                            {
+                                text: <span>{account.name + ":" + showPK(account.pk)}</span>, onPress: () => {
+                                    self.setState({pk: account.pk, name: account.name});
+                                    localStorage.setItem("PK", account.pk);
+                                }
+                            }
+                        );
+                    });
+                    operation(actions);
+                });
+            })
+    }
 
+
+    renderContent(name, pk, show) {
+        let content;
+        if (name === "market") {
+            content = <Home pk={pk} show={show}/>
+        } else if (name === "my") {
+            content = <My pk={pk} show={show}/>
+        } else if (name === "help") {
+            content = <Help pk={pk} show={show}/>
+        }
+        return <div>
+            <WingBlank size="md">
+                <WhiteSpace/>
+                <Flex>
+                    <Flex.Item style={{flex: 85}}>
+                        <span>{language.e().home.account} : {this.state.name} {showPK(pk, 12)}</span>
+                    </Flex.Item>
+                    <Flex.Item style={{flex: 15}}>
+                        <div><a onClick={this.changAccount.bind(this)}>{language.e().home.change}</a></div>
+                    </Flex.Item>
+                </Flex>
+                <WhiteSpace/>
+
+            </WingBlank>
+            {content}
+        </div>
+    }
 
     render() {
         return (
@@ -70,7 +114,7 @@ class App extends Component {
                                      this.setState({selectedTab: "market"})
                                  }}
                     >
-                        <Home/>
+                        {this.renderContent("market", this.state.pk, this.state.selectedTab === 'market')}
                     </TabBar.Item>
 
                     <TabBar.Item title="我的" key="my"
@@ -82,7 +126,7 @@ class App extends Component {
                                      this.setState({selectedTab: "my"})
                                  }}
                     >
-                        <My/>
+                        {this.renderContent("my", this.state.pk, this.state.selectedTab === 'my')}
                     </TabBar.Item>
 
                     {/*<TabBar.Item title="工具" key="tool"*/}
@@ -113,7 +157,7 @@ class App extends Component {
                                      this.setState({selectedTab: "help"})
                                  }}
                     >
-                        <Help/>
+                        {this.renderContent("help", this.state.pk, this.state.selectedTab === 'help')}
                     </TabBar.Item>
                 </TabBar>
             </div>

@@ -44,29 +44,9 @@ class Abi {
                     tickets.set(item, "COIN");
                 });
             }
-            if (item.Tickets.has("COIN_1")) {
-                item.Tickets.get("COIN_1").forEach(item => {
-                    tickets.set(item, "COIN_1");
-                });
-            }
-            if (item.Tickets.has("COIN_2")) {
-                item.Tickets.get("COIN_2").forEach(item => {
-                    tickets.set(item, "COIN_2");
-                });
-            }
-            if (item.Tickets.has("COIN_3")) {
-                item.Tickets.get("COIN_3").forEach(item => {
-                    tickets.set(item, "COIN_3");
-                });
-            }
-            if (item.Tickets.has("COIN_4")) {
-                item.Tickets.get("COIN_4").forEach(item => {
-                    tickets.set(item, "COIN_4");
-                });
-            }
-            if (item.Tickets.has("COIN_5")) {
-                item.Tickets.get("COIN_5").forEach(item => {
-                    tickets.set(item, "COIN_5");
+            if (item.Tickets.has("COIN2")) {
+                item.Tickets.get("COIN2").forEach(item => {
+                    tickets.set(item, "COIN2");
                 });
             }
             callback({pk: item.PK, mainPKr: item.MainPKr, name: item.Name, balances: item.Balance, tickets: tickets})
@@ -83,29 +63,9 @@ class Abi {
                         tickets.set(item, "COIN");
                     });
                 }
-                if (item.Tickets.has("COIN_1")) {
-                    item.Tickets.get("COIN_1").forEach(item => {
-                        tickets.set(item, "COIN_1");
-                    });
-                }
-                if (item.Tickets.has("COIN_2")) {
-                    item.Tickets.get("COIN_2").forEach(item => {
-                        tickets.set(item, "COIN_2");
-                    });
-                }
-                if (item.Tickets.has("COIN_3")) {
-                    item.Tickets.get("COIN_3").forEach(item => {
-                        tickets.set(item, "COIN_3");
-                    });
-                }
-                if (item.Tickets.has("COIN_4")) {
-                    item.Tickets.get("COIN_4").forEach(item => {
-                        tickets.set(item, "COIN_4");
-                    });
-                }
-                if (item.Tickets.has("COIN_5")) {
-                    item.Tickets.get("COIN_5").forEach(item => {
-                        tickets.set(item, "COIN_5");
+                if (item.Tickets.has("COIN2")) {
+                    item.Tickets.get("COIN2").forEach(item => {
+                        tickets.set(item, "COIN2");
                     });
                 }
                 accounts.push({
@@ -184,3 +144,4 @@ class Abi {
 }
 
 export default Abi;
+
