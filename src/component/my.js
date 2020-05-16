@@ -79,7 +79,7 @@ class My extends Base {
             {text: '取消', style: 'default'},
             {
                 text: '确定', onPress: () => {
-                    let token = this.tokenValue.state.value;
+                    let token = this.tokenValue.state.value.toUpperCase();
                     let decimals = parseInt(this.decimalsValue.state.value);
                     let initialSupply = parseInt(this.supplyValue.state.value);
                     pAbi.createToken(self.state.pk, self.state.mainPKr, token, decimals, initialSupply);
