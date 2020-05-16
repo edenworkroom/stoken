@@ -8,10 +8,10 @@ class Help extends Component {
 
     render() {
         return (
-            <WingBlank size="md">
+            <div style={{minHeight: document.documentElement.clientHeight}}>
                 <WhiteSpace/>
-                <Button activeStyle={false}>待更新</Button><WhiteSpace/>
-            </WingBlank>
+                <img src={require('../icon/help.png')} width={"100%"}/>
+            </div>
         )
     }
 }

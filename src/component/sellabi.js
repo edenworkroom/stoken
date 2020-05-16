@@ -6,9 +6,25 @@ import Abi from "./abi";
 
 
 const abiJson = [{
+    "constant": true,
+    "inputs": [{"name": "tickets", "type": "bytes32[]"}],
+    "name": "hasTockets",
+    "outputs": [{"name": "rets", "type": "bool[]"}],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+}, {
     "constant": false,
     "inputs": [{"name": "ticket", "type": "bytes32"}],
     "name": "cancelSellToken",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "constant": false,
+    "inputs": [{"name": "_fee", "type": "uint256"}],
+    "name": "setFee",
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
@@ -52,7 +68,7 @@ const abiJson = [{
     "constant": false,
     "inputs": [{"name": "ticket", "type": "bytes32"}],
     "name": "buyToken",
-    "outputs": [],
+    "outputs": [{"name": "", "type": "bool"}],
     "payable": true,
     "stateMutability": "payable",
     "type": "function"
@@ -77,7 +93,7 @@ const abiJson = [{
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "constructor"
-}, {
+}, {"payable": true, "stateMutability": "payable", "type": "fallback"}, {
     "anonymous": false,
     "inputs": [{"indexed": true, "name": "previousOwner", "type": "address"}, {
         "indexed": true,
@@ -87,11 +103,17 @@ const abiJson = [{
     "name": "OwnershipTransferred",
     "type": "event"
 }];
-const caddress = "4hCycuxTGDTScKLJAysnQci2U7q6Y1VeoBb4HXHX19Lv6YZWKnQbLyXGD6UynerCX8RqngwcAceJYkNbZo5PXq3f";
+const caddress = "5dvVrGaHYDzBmP3fKBNxWLi8DdRmjwJaetPx7ghg1pRbdxMBTEHxCc64vwFLPyDrbvKJtiWiiimc35bbCLYTLDKg";
 const contract = serojs.callContract(abiJson, caddress);
 
 
 class SellAbi extends Abi {
+
+    hasTickets(from, tickets, callback) {
+        super.callMethod(contract, "hasTockets", from, [tickets], function (rets) {
+            callback(rets);
+        });
+    }
 
     sellTokens(from, start, end, callback) {
         super.callMethod(contract, "sellTokens", from, [start, end], function (json) {

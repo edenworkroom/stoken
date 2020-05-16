@@ -31,29 +31,41 @@ class My extends Base {
                 tickets.push(key);
             });
 
-            if (tickets.length > 0) {
-                pAbi.tokens(account.mainPKr, tickets, function (tokens) {
-                    let update = false;
-                    if (!self.state.tokens) {
-                        update = true;
-                    } else {
-                        if (tokens.length == self.state.tokens.length) {
-                            for (var i = 0; i < tokens.length; i++) {
-                                let a = tokens[i];
-                                let b = self.state.tokens[i];
-                                if (a.token != b.token || a.totalSupply != b.totalSupply || a.balance != b.balance || a.decimals != b.decimals) {
-                                    update = true;
-                                    break;
+            sAbi.hasTickets(account.mainPKr, tickets, function (flags) {
+                console.log("hasTickets", flags);
+                tickets = tickets.filter(function (currentValue, index) {
+                    return !flags[index];
+                });
+
+                if (tickets.length > 0) {
+                    pAbi.tokens(account.mainPKr, tickets, function (tokens) {
+                        console.log("tokens", tokens)
+                        let update = false;
+                        if (!self.state.tokens) {
+                            update = true;
+                        } else {
+                            if (tokens.length == self.state.tokens.length) {
+                                for (var i = 0; i < tokens.length; i++) {
+                                    let a = tokens[i];
+                                    let b = self.state.tokens[i];
+                                    if (a.token != b.token || a.totalSupply != b.totalSupply || a.balance != b.balance || a.decimals != b.decimals) {
+                                        update = true;
+                                        break;
+                                    }
                                 }
+                            } else {
+                                update = true;
                             }
                         }
-                    }
 
-                    if (update) {
-                        self.setState({tokens: tokens, tickets: account.tickets});
-                    }
-                });
-            }
+                        if (update) {
+                            self.setState({tokens: tokens, tickets: account.tickets});
+                        }
+                    });
+                } else if (self.state.tokens) {
+                    self.setState({tokens: []});
+                }
+            });
         });
     }
 

@@ -44,9 +44,9 @@ class Abi {
                     tickets.set(item, "COIN");
                 });
             }
-            if (item.Tickets.has("COIN2")) {
-                item.Tickets.get("COIN2").forEach(item => {
-                    tickets.set(item, "COIN2");
+            if (item.Tickets.has("COIN1")) {
+                item.Tickets.get("COIN1").forEach(item => {
+                    tickets.set(item, "COIN1");
                 });
             }
             callback({pk: item.PK, mainPKr: item.MainPKr, name: item.Name, balances: item.Balance, tickets: tickets})
@@ -63,9 +63,9 @@ class Abi {
                         tickets.set(item, "COIN");
                     });
                 }
-                if (item.Tickets.has("COIN2")) {
-                    item.Tickets.get("COIN2").forEach(item => {
-                        tickets.set(item, "COIN2");
+                if (item.Tickets.has("COIN1")) {
+                    item.Tickets.get("COIN1").forEach(item => {
+                        tickets.set(item, "COIN1");
                     });
                 }
                 accounts.push({
