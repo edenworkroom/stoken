@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import sAbi from './sellabi';
 import {Button, Card, Flex, WhiteSpace, WingBlank} from "antd-mobile";
-import {showValue} from "./common";
+import {showValue, showValueP} from "./common";
 import Base from './base'
 
 class Home extends Base {
@@ -52,11 +52,11 @@ class Home extends Base {
 
                                     <Flex>
                                         <Flex.Item style={{flex: 2}}><span
-                                            style={{fontSize: '14px'}}>{item.totalSupply} </span></Flex.Item>
+                                            style={{fontSize: '14px'}}>{showValueP(item.totalSupply, item.decimals, 5)} </span></Flex.Item>
                                         <Flex.Item style={{flex: 1}}><span
                                             style={{fontSize: '14px'}}>{item.decimals} </span></Flex.Item>
                                         <Flex.Item style={{flex: 2}}><span
-                                            style={{fontSize: '14px'}}>{item.balance} </span></Flex.Item>
+                                            style={{fontSize: '14px'}}>{showValueP(item.balance, item.decimals, 5)} </span></Flex.Item>
                                     </Flex>
                                 </div>
                             </Card.Body>
