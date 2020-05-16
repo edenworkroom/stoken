@@ -76,9 +76,9 @@ class My extends Base {
             <InputItem type="number" ref={el => this.decimalsValue = el} placeholder="decimals">精度</InputItem>
             <InputItem type="number" ref={el => this.supplyValue = el} placeholder="initialSupply">数量</InputItem>
         </div>, [
-            {text: 'Cancel', style: 'default'},
+            {text: '取消', style: 'default'},
             {
-                text: 'Submit', onPress: () => {
+                text: '确定', onPress: () => {
                     let token = this.tokenValue.state.value;
                     let decimals = parseInt(this.decimalsValue.state.value);
                     let initialSupply = parseInt(this.supplyValue.state.value);
