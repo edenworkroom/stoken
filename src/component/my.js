@@ -104,9 +104,9 @@ class My extends Base {
                     <InputItem ref={el => this.tokenBuyValue = el} defaultValue="SERO" disabled={true}
                                placeholder="initialSupply">Token</InputItem>
                 </div>, [
-                    {text: 'Cancel', style: 'default'},
+                    {text: '取消', style: 'default'},
                     {
-                        text: 'Submit', onPress: () => {
+                        text: '确定', onPress: () => {
                             let value = new BigNumber(this.sellValue.state.value).multipliedBy(new BigNumber(10).pow(18));
                             let tokenBuy = this.tokenBuyValue.state.value;
                             console.log("sell", value.toNumber(), tokenBuy);
@@ -124,9 +124,9 @@ class My extends Base {
                         labelNumber={5}
                     />
                 </div>, [
-                    {text: 'Cancel', style: 'default'},
+                    {text: '取消', style: 'default'},
                     {
-                        text: 'Submit', onPress: () => {
+                        text: '确定', onPress: () => {
                             let to = this.toValue.state.value;
                             pAbi.give(this.state.pk, this.state.mainPKr, to, catg, opt.props.ticket);
                         }
@@ -143,9 +143,9 @@ class My extends Base {
                         labelNumber={5}
                     />
                 </div>, [
-                    {text: 'Cancel', style: 'default'},
+                    {text: '取消', style: 'default'},
                     {
-                        text: 'Submit', onPress: () => {
+                        text: '确定', onPress: () => {
                             let value = new BigNumber(this.sendValue.state.value).multipliedBy(new BigNumber(10).pow(opt.props.decimals));
                             let to = this.toValue.state.value;
                             pAbi.transfer(this.state.pk, this.state.mainPKr, to, value.toNumber(), catg, opt.props.ticket);
@@ -157,9 +157,9 @@ class My extends Base {
                 alert('增发', <div>
                     <InputItem type="number" ref={el => this.issuesValue = el} placeholder="amount"/>
                 </div>, [
-                    {text: 'Cancel', style: 'default'},
+                    {text: '取消', style: 'default'},
                     {
-                        text: 'Submit', onPress: () => {
+                        text: '确定', onPress: () => {
                             let issues = new BigNumber(this.issuesValue.state.value).multipliedBy(new BigNumber(10).pow(opt.props.decimals));
                             pAbi.mintToken(this.state.pk, this.state.mainPKr, issues.toNumber(), catg, opt.props.ticket);
                         }
@@ -170,9 +170,9 @@ class My extends Base {
                 alert('销毁', <div>
                     <InputItem type="number" ref={el => this.supplyValue = el} placeholder="amount"/>
                 </div>, [
-                    {text: 'Cancel', style: 'default'},
+                    {text: '取消', style: 'default'},
                     {
-                        text: 'Submit', onPress: () => {
+                        text: '确定', onPress: () => {
                             let supply = new BigNumber(this.supplyValue.state.value).multipliedBy(new BigNumber(10).pow(opt.props.decimals));
                             console.log("burning", supply, opt.props.token, catg, opt.props.ticket)
                             pAbi.burnToken(this.state.pk, this.state.mainPKr, supply.toNumber(), catg, opt.props.ticket);
@@ -184,9 +184,9 @@ class My extends Base {
                 alert('设置精度', <div>
                     <InputItem type="number" ref={el => this.decimalValue = el} placeholder="decimal"/>
                 </div>, [
-                    {text: 'Cancel', style: 'default'},
+                    {text: '取消', style: 'default'},
                     {
-                        text: 'Submit', onPress: () => {
+                        text: '确定', onPress: () => {
                             pAbi.setDecimals(this.state.pk, this.state.mainPKr, this.decimalValue.state.value, catg, opt.props.ticket);
                         }
                     },
