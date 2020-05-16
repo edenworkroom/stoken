@@ -72,7 +72,7 @@ class My extends Base {
     createToken() {
         let self = this;
         alert('一键发币', <div>
-            <InputItem ref={el => this.tokenValue = el} placeholder="tokens">币名</InputItem>
+            <InputItem ref={el => this.tokenValue = el} placeholder="token name">币名</InputItem>
             <InputItem type="number" ref={el => this.decimalsValue = el} placeholder="decimals">精度</InputItem>
             <InputItem type="number" ref={el => this.supplyValue = el} placeholder="initialSupply">数量</InputItem>
         </div>, [
