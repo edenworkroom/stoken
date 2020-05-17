@@ -17,7 +17,6 @@ export default class Base extends Component {
         if (!show && !this.state.show) {
             return;
         }
-        console.log("init", this.constructor.name, this.state.show, this.props.pk, this._init);
         if (!pk) {
             pk = this.state.pk;
         }

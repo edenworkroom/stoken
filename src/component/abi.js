@@ -39,14 +39,14 @@ class Abi {
         let self = this;
         seropp.getAccountDetail(pk, function (item) {
             let tickets = new Map();
-            if (item.Tickets.has("COIN")) {
-                item.Tickets.get("COIN").forEach(item => {
-                    tickets.set(item, "COIN");
-                });
-            }
-            if (item.Tickets.has("COIN1")) {
-                item.Tickets.get("COIN1").forEach(item => {
-                    tickets.set(item, "COIN1");
+            // if (item.Tickets.has("COIN")) {
+            //     item.Tickets.get("COIN").forEach(item => {
+            //         tickets.set(item, "COIN");
+            //     });
+            // }
+            if (item.Tickets.has("COIN3")) {
+                item.Tickets.get("COIN3").forEach(item => {
+                    tickets.set(item, "COIN3");
                 });
             }
             callback({pk: item.PK, mainPKr: item.MainPKr, name: item.Name, balances: item.Balance, tickets: tickets})
@@ -58,14 +58,14 @@ class Abi {
             let accounts = [];
             data.forEach(function (item, index) {
                 let tickets = new Map();
-                if (item.Tickets.has("COIN")) {
-                    item.Tickets.get("COIN").forEach(item => {
-                        tickets.set(item, "COIN");
-                    });
-                }
-                if (item.Tickets.has("COIN1")) {
-                    item.Tickets.get("COIN1").forEach(item => {
-                        tickets.set(item, "COIN1");
+                // if (item.Tickets.has("COIN")) {
+                //     item.Tickets.get("COIN").forEach(item => {
+                //         tickets.set(item, "COIN");
+                //     });
+                // }
+                if (item.Tickets.has("COIN3")) {
+                    item.Tickets.get("COIN3").forEach(item => {
+                        tickets.set(item, "COIN3");
                     });
                 }
                 accounts.push({

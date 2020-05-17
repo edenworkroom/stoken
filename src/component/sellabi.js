@@ -103,7 +103,7 @@ const abiJson = [{
     "name": "OwnershipTransferred",
     "type": "event"
 }];
-const caddress = "5dvVrGaHYDzBmP3fKBNxWLi8DdRmjwJaetPx7ghg1pRbdxMBTEHxCc64vwFLPyDrbvKJtiWiiimc35bbCLYTLDKg1";
+const caddress = "2aaXq93dPBCW1GNq3UaoJ1rhkkdWXzYtfEFZHiF6J5AQV4Bxto9mz3X46SphPQGyHJ1A7fRkaQVTUnPdN9kR57YF";
 const contract = serojs.callContract(abiJson, caddress);
 
 

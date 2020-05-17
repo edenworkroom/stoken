@@ -142,7 +142,7 @@ const abiJson = [{
     "name": "OwnershipTransferred",
     "type": "event"
 }];
-const caddress = "5PFrZeF7aFTYJWnB5tseBcU5BVgUAUywhxFyuz6aK6iqgsZCk2T2nP8vA9f6QqxvUiYh7UywpRsP62LM1sz5sBMc1";
+const caddress = "5jeMJbzVT8tM8iTD7PM8gYerUPwpYXQeBD1Eh2HQ15cYud3XtnaCVWJ5yn9L9zJCUjtYYc9sW9LJxFd8Ph4eYhRw";
 const contract = serojs.callContract(abiJson, caddress);
 
 class PlatformAbi extends Abi {

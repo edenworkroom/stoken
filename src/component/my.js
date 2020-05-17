@@ -32,14 +32,12 @@ class My extends Base {
             });
 
             sAbi.hasTickets(account.mainPKr, tickets, function (flags) {
-                console.log("hasTickets", flags);
                 tickets = tickets.filter(function (currentValue, index) {
                     return !flags[index];
                 });
 
                 if (tickets.length > 0) {
                     pAbi.tokens(account.mainPKr, tickets, function (tokens) {
-                        console.log("tokens", tokens)
                         let update = false;
                         if (!self.state.tokens) {
                             update = true;
