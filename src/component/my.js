@@ -10,7 +10,7 @@ import burning from "../icon/burning.png";
 import sell from "../icon/sell.png";
 import give from "../icon/give.png";
 import BigNumber from 'bignumber.js'
-import {showPK, showValueP} from "./common";
+import {showPK, showToken, showValueP} from "./common";
 import Base from './base'
 
 const alert = Modal.alert;
@@ -273,13 +273,29 @@ class My extends Base {
                                }>
 
                         <Flex>
-                            <Flex.Item style={{flex: 1}}><span
-                                style={{fontSize: '14px'}}>{item.token} </span></Flex.Item>
-                            <Flex.Item style={{flex: 1}}><span
+                            <Flex.Item style={{flex: 3}}>
+                                {
+                                    item.token.length > 10 ?
+                                        <div>
+                                            <span style={{fontSize: '14px'}}>{showToken(item.token)} </span>
+                                            <div style={{fontSize: '10px', color: '#A8A8A8'}}>
+                                                {item.token}
+                                            </div>
+                                        </div> : <span style={{fontSize: '14px'}}>{item.token} </span>
+
+                                }
+
+                                {/* <span style={{fontSize: '14px'}}>{showToken(item.token)} </span>
+                                <div style={{fontSize: '10px', color: '#A8A8A8'}}>
+                                    {item.token}
+                                </div>*/}
+                                {/*<span style={{fontSize: '14px'}}>{item.token} </span>*/}
+                            </Flex.Item>
+                            <Flex.Item style={{flex: 2}}><span
                                 style={{fontSize: '14px'}}>{showValueP(item.totalSupply, item.decimals, 9)} </span></Flex.Item>
                             <Flex.Item style={{flex: 1}}><span
                                 style={{fontSize: '14px'}}>{item.decimals} </span></Flex.Item>
-                            <Flex.Item style={{flex: 1}}><span
+                            <Flex.Item style={{flex: 2}}><span
                                 style={{fontSize: '14px'}}>{showValueP(item.balance, item.decimals, 9)} </span></Flex.Item>
                         </Flex>
                     </List.Item>
@@ -298,9 +314,9 @@ class My extends Base {
                     <List renderHeader={() => {
                         return <Flex>
                             <Flex.Item style={{flex: 3}}>名字</Flex.Item>
-                            <Flex.Item style={{flex: 3}}>发行量</Flex.Item>
-                            <Flex.Item style={{flex: 3}}>精度</Flex.Item>
-                            <Flex.Item style={{flex: 3}}>合约余额</Flex.Item>
+                            <Flex.Item style={{flex: 2}}>发行量</Flex.Item>
+                            <Flex.Item style={{flex: 1}}>精度</Flex.Item>
+                            <Flex.Item style={{flex: 2}}>合约余额</Flex.Item>
                             <Flex.Item style={{flex: 0.9}}></Flex.Item>
                         </Flex>
                     }}>

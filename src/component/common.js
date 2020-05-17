@@ -1,5 +1,14 @@
 import BigNumber from "bignumber.js";
 
+
+export function showToken(token) {
+    if (token.length > 10) {
+        return token.slice(0, 8) + "..." + token.slice(-2)
+    } else {
+        return token
+    }
+}
+
 export function showPrice(price) {
     if (price) {
         let ret = new BigNumber(price).dividedBy(new BigNumber(1e18)).toFixed(18);
