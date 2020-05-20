@@ -15,7 +15,7 @@ class Home extends Base {
             self.setState({mainPKr: account.mainPKr})
             sAbi.sellTokens(account.mainPKr, 0, 100, function (tokens) {
                 tokens.forEach(function (each) {
-                    if (each.catg === "COIN1") {
+                    if (each.coinType === "COIN1") {
                         each.decimals = 0;
                     }
                 });
