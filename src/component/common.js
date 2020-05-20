@@ -20,7 +20,15 @@ export function showPrice(price) {
 
 export function showValueP(val, decimal, decimalPlaces) {
     let num = new BigNumber(val).dividedBy(new BigNumber(10).pow(decimal));
-    if (num.comparedTo(1000000) >= 0) {
+    if (num.comparedTo(1000000000000000000) >= 0) {
+        let text = num.toNumber().toString();
+        let vals = text.split("+")
+        text = trimNumber(vals[0], 3);
+        if (vals.length > 1) {
+            text = text + "..+" + vals[1];
+        }
+        return text;
+    } else if (num.comparedTo(1000000) >= 0) {
         let text = num.dividedBy(1000000).toFixed(decimalPlaces);
         return trimNumber(text, decimalPlaces) + "M";
     } else if (num.comparedTo(1000) >= 0) {
@@ -29,7 +37,6 @@ export function showValueP(val, decimal, decimalPlaces) {
     } else {
         return trimNumber(num.toFixed(decimalPlaces), decimalPlaces);
     }
-
 }
 
 export function showPK(pk, len) {

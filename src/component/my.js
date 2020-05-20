@@ -1,7 +1,19 @@
 import React, {Component} from "react";
-import {Button, WhiteSpace, WingBlank, Modal, InputItem, List, Popover, Icon, Flex, TextareaItem} from "antd-mobile";
+import {
+    Button,
+    WhiteSpace,
+    WingBlank,
+    Modal,
+    InputItem,
+    List,
+    Popover,
+    Icon,
+    Flex,
+    TextareaItem,
+    NoticeBar
+} from "antd-mobile";
 
-import pAbi from './platformabi';
+
 import sAbi from './sellabi';
 import language from './language'
 import auction from "../icon/auction.png";
@@ -12,6 +24,7 @@ import give from "../icon/give.png";
 import BigNumber from 'bignumber.js'
 import {showPK, showToken, showValueP} from "./common";
 import Base from './base'
+import {pAbi3, pAbi1} from './platformabi';
 
 const alert = Modal.alert;
 
@@ -23,21 +36,66 @@ class My extends Base {
         super(props);
     }
 
+    sleep(ms) {
+        return new Promise(function (resolve, reject) {
+            setTimeout(resolve, ms);
+        })
+    }
+
     _init(pk) {
         let self = this;
-        pAbi.accountDetails(pk, function (account) {
+        pAbi3.accountDetails(pk, function (account) {
+            let tickets1 = [];
+            let tickets3 = [];
+
+
             let tickets = [];
             account.tickets.forEach(function (value, key) {
                 tickets.push(key);
             });
+
+            if (tickets.length == 0) {
+                if (self.state.tokens && self.state.tokens.length > 0) {
+                    self.setState({tokens: []});
+                }
+                return;
+            }
 
             sAbi.hasTickets(account.mainPKr, tickets, function (flags) {
                 tickets = tickets.filter(function (currentValue, index) {
                     return !flags[index];
                 });
 
-                if (tickets.length > 0) {
-                    pAbi.tokens(account.mainPKr, tickets, function (tokens) {
+                if (tickets.length == 0) {
+                    if (self.state.tokens && self.state.tokens.length > 0) {
+                        self.setState({tokens: []});
+                    }
+                    return;
+                }
+
+                tickets.forEach(function (each) {
+                    if ("COIN1" === account.tickets.get(each)) {
+                        tickets1.push(each);
+                    } else if ("COIN3" === account.tickets.get(each)) {
+                        tickets3.push(each);
+                    }
+                });
+
+
+                pAbi3.tokens(account.mainPKr, tickets3, function (tokens3) {
+                    let tokens = [];
+                    if (tokens3.length > 0) {
+                        tokens.push.apply(tokens, tokens3);
+                    }
+                    pAbi1.tokens(account.mainPKr, tickets1, function (tokens1) {
+                        if (tokens1.length > 0) {
+                            tokens1.forEach(function (each) {
+                                each.decimals = 0;
+                                each.catg = "COIN1";
+                                tokens.push(each);
+                            });
+                        }
+
                         let update = false;
                         if (!self.state.tokens) {
                             update = true;
@@ -55,14 +113,11 @@ class My extends Base {
                                 update = true;
                             }
                         }
-
                         if (update) {
                             self.setState({tokens: tokens, tickets: account.tickets});
                         }
                     });
-                } else if (self.state.tokens) {
-                    self.setState({tokens: []});
-                }
+                });
             });
         });
     }
@@ -80,7 +135,7 @@ class My extends Base {
                     let token = this.tokenValue.state.value.toUpperCase();
                     let decimals = parseInt(this.decimalsValue.state.value);
                     let initialSupply = parseInt(this.supplyValue.state.value);
-                    pAbi.createToken(self.state.pk, self.state.mainPKr, token, decimals, initialSupply);
+                    pAbi3.createToken(self.state.pk, self.state.mainPKr, token, decimals, initialSupply);
                 }
             },
         ]);
@@ -91,7 +146,10 @@ class My extends Base {
             popoverVisible: false,
         });
         let catg = this.state.tickets.get(opt.props.ticket);
-        console.log("opt", opt);
+        let pAbi = pAbi3;
+        if (catg == "COIN1") {
+            pAbi = pAbi1;
+        }
         switch (opt.props.value) {
 
             case "auction":
@@ -107,7 +165,6 @@ class My extends Base {
                         text: '确定', onPress: () => {
                             let value = new BigNumber(this.sellValue.state.value).multipliedBy(new BigNumber(10).pow(18));
                             let tokenBuy = this.tokenBuyValue.state.value;
-                            console.log("sell", value.toNumber(), tokenBuy);
                             sAbi.sellToken(this.state.pk, this.state.mainPKr, tokenBuy, value.toNumber(), catg, opt.props.ticket);
                         }
                     },
@@ -172,7 +229,6 @@ class My extends Base {
                     {
                         text: '确定', onPress: () => {
                             let supply = new BigNumber(this.supplyValue.state.value).multipliedBy(new BigNumber(10).pow(opt.props.decimals));
-                            console.log("burning", supply, opt.props.token, catg, opt.props.ticket)
                             pAbi.burnToken(this.state.pk, this.state.mainPKr, supply.toNumber(), catg, opt.props.ticket);
                         }
                     },
@@ -245,11 +301,14 @@ class My extends Base {
                                                     <span style={{marginRight: 5}}>销毁</span>
                                                 </Popover.Item>),
                                                 (<Popover.Item key="2" value="reset" ticket={item.ticket}
+                                                               disabled={item.catg === "COIN1"}
                                                                icon={<img src={require('../icon/reset.png')}
                                                                           className="am-icon am-icon-xs"
                                                                           alt=""/>}>
                                                     <span style={{marginRight: 5}}>设置</span>
                                                 </Popover.Item>)
+
+
                                             ]}
                                             align={{
                                                 overflow: {adjustY: 0, adjustX: 0},
@@ -304,6 +363,11 @@ class My extends Base {
 
         return (
             <div>
+                {/*<WhiteSpace size="md"/>*/}
+                {/*<NoticeBar marqueeProps={{loop: true, style: {padding: '0 7.5px'}}}>*/}
+
+                {/*</NoticeBar>*/}
+                {/*<WhiteSpace size="lg" />*/}
                 <WingBlank size="md">
                     <WhiteSpace/>
                     <Button onClick={this.createToken.bind(this)}>一键发币</Button>

@@ -12,7 +12,7 @@ const config = {
     logo: document.location.protocol + '//' + document.location.host + '/stoken/logo.png'
 }
 
-class Abi {
+export class Abi {
 
     constructor() {
         let self = this;
@@ -39,11 +39,11 @@ class Abi {
         let self = this;
         seropp.getAccountDetail(pk, function (item) {
             let tickets = new Map();
-            // if (item.Tickets.has("COIN")) {
-            //     item.Tickets.get("COIN").forEach(item => {
-            //         tickets.set(item, "COIN");
-            //     });
-            // }
+            if (item.Tickets.has("COIN1")) {
+                item.Tickets.get("COIN1").forEach(item => {
+                    tickets.set(item, "COIN1");
+                });
+            }
             if (item.Tickets.has("COIN3")) {
                 item.Tickets.get("COIN3").forEach(item => {
                     tickets.set(item, "COIN3");
@@ -58,11 +58,11 @@ class Abi {
             let accounts = [];
             data.forEach(function (item, index) {
                 let tickets = new Map();
-                // if (item.Tickets.has("COIN")) {
-                //     item.Tickets.get("COIN").forEach(item => {
-                //         tickets.set(item, "COIN");
-                //     });
-                // }
+                if (item.Tickets.has("COIN1")) {
+                    item.Tickets.get("COIN1").forEach(item => {
+                        tickets.set(item, "COIN1");
+                    });
+                }
                 if (item.Tickets.has("COIN3")) {
                     item.Tickets.get("COIN3").forEach(item => {
                         tickets.set(item, "COIN3");
@@ -88,7 +88,7 @@ class Abi {
             from: from,
             to: contract.address,
             data: packData
-        }
+        };
 
         seropp.call(callParams, function (callData) {
             if (callData !== "0x") {
@@ -127,7 +127,6 @@ class Abi {
             tkt: ticket
         };
 
-        console.log("estimateParam", estimateParam);
         seropp.estimateGas(estimateParam, function (gas, error) {
             if (error) {
                 Toast.fail("Failed to execute smart contract")
@@ -144,4 +143,3 @@ class Abi {
 }
 
 export default Abi;
-
