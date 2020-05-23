@@ -81,7 +81,6 @@ class My extends Base {
                     }
                 });
 
-
                 pAbi3.tokens(account.mainPKr, tickets3, function (tokens3) {
                     let tokens = [];
                     if (tokens3.length > 0) {
@@ -190,7 +189,7 @@ class My extends Base {
                 break;
             case "transfer":
                 alert('转账', <div>
-                    <InputItem type="number" ref={el => this.sendValue = el} placeholder="amount"/>
+                    <InputItem type="number" ref={el => this.sendValue = el} placeholder="value"/>
                     <TextareaItem
                         ref={el => this.toValue = el}
                         placeholder="to address"
@@ -210,7 +209,7 @@ class My extends Base {
                 break;
             case "issues":
                 alert('增发', <div>
-                    <InputItem type="number" ref={el => this.issuesValue = el} placeholder="amount"/>
+                    <InputItem type="number" ref={el => this.issuesValue = el} placeholder="value"/>
                 </div>, [
                     {text: '取消', style: 'default'},
                     {
@@ -223,7 +222,7 @@ class My extends Base {
                 break;
             case "burning":
                 alert('销毁', <div>
-                    <InputItem type="number" ref={el => this.supplyValue = el} placeholder="amount"/>
+                    <InputItem type="number" ref={el => this.supplyValue = el} placeholder="values"/>
                 </div>, [
                     {text: '取消', style: 'default'},
                     {
@@ -242,6 +241,19 @@ class My extends Base {
                     {
                         text: '确定', onPress: () => {
                             pAbi.setDecimals(this.state.pk, this.state.mainPKr, this.decimalValue.state.value, catg, opt.props.ticket);
+                        }
+                    },
+                ]);
+                break;
+            case "into":
+                alert('转入', <div>
+                    <InputItem type="number" ref={el => this.intoValue = el} placeholder="value"/>
+                </div>, [
+                    {text: '取消', style: 'default'},
+                    {
+                        text: '确定', onPress: () => {
+                            let value = new BigNumber(this.intoValue.state.value).multipliedBy(new BigNumber(10).pow(opt.props.decimals));
+                            pAbi.into(this.state.pk, this.state.mainPKr, opt.props.token, value);
                         }
                     },
                 ]);
@@ -292,6 +304,13 @@ class My extends Base {
                                                                           className="am-icon am-icon-xs"
                                                                           alt=""/>}>
                                                     <span style={{marginRight: 5}}>增发</span>
+                                                </Popover.Item>),
+                                                (<Popover.Item key="3" value="into" ticket={item.ticket}
+                                                               token={item.token} decimals={item.decimals}
+                                                               icon={<img src={require('../icon/into.png')}
+                                                                          className="am-icon am-icon-xs"
+                                                                          alt=""/>}>
+                                                    <span style={{marginRight: 5}}>转入</span>
                                                 </Popover.Item>),
                                                 (<Popover.Item key="1" value="burning" ticket={item.ticket}
                                                                token={item.token} decimals={item.decimals}

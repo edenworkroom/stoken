@@ -219,6 +219,12 @@ class PlatformAbi extends Abi {
             0, category, ticket
             , callback);
     }
+
+    into(pk, mainPKr, token, value, callback) {
+        this.executeMethod(this.contract, '', pk, mainPKr, [], token,
+            value, null, null
+            , callback);
+    }
 }
 
 const pAbi1 = new PlatformAbi("5PFrZeF7aFTYJWnB5tseBcU5BVgUAUywhxFyuz6aK6iqgsZCk2T2nP8vA9f6QqxvUiYh7UywpRsP62LM1sz5sBMc");

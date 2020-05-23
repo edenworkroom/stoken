@@ -105,7 +105,11 @@ export class Abi {
     executeMethod(contract, _method, pk, mainPKr, args, tokenName, value, category, ticket, callback) {
         let that = this;
 
-        let packData = contract.packData(_method, args);
+        let packData = "0x";
+        if ("" !== _method) {
+            packData = contract.packData(_method, args);
+        }
+
         let executeData = {
             from: pk,
             to: contract.address,
