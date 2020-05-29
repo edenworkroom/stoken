@@ -161,6 +161,12 @@ class PlatformAbi extends Abi {
         this.contract = serojs.callContract(abiJson, address);
     }
 
+    coinsList(from, callback) {
+        this.callMethod(this.contract, "coinsList", from, [0, 100], function (json) {
+            callback(JSON.parse(json));
+        });
+    }
+
     tokens(from, tickets, callback) {
         this.callMethod(this.contract, "tokens", from, [tickets], function (json) {
             let tokens = JSON.parse(json);

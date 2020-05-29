@@ -13,6 +13,7 @@ import Help from "./component/help";
 import language from "./component/language";
 import {showPK} from "./component/common";
 import Abi from "./component/abi";
+import TokenList from "./component/list";
 
 const abi = new Abi();
 
@@ -72,6 +73,8 @@ class App extends Component {
             content = <My pk={pk} show={show}/>
         } else if (name === "help") {
             content = <Help pk={pk} show={show}/>
+        }else if (name === "list") {
+            content = <TokenList pk={pk} show={show}/>
         }
         return <div>
             <WingBlank size="md">
@@ -148,6 +151,17 @@ class App extends Component {
                     {/*    </Carousel>*/}
                     {/*</TabBar.Item>*/}
 
+                    <TabBar.Item title="列表" key="list"
+                                 selected={this.state.selectedTab === 'list'}
+                                 icon={<img src={require('./icon/list_0.png')} style={{width: '22px', height: '22px'}}/>}
+                                 selectedIcon={<img src={require('./icon/list_1.png')}
+                                                    style={{width: '22px', height: '22px'}}/>}
+                                 onPress={() => {
+                                     this.setState({selectedTab: "list"})
+                                 }}
+                    >
+                        {this.renderContent("list", this.state.pk, this.state.selectedTab === 'list')}
+                    </TabBar.Item>
                     <TabBar.Item title="帮助" key="help"
                                  selected={this.state.selectedTab === 'help'}
                                  icon={<img src={help_0} style={{width: '22px', height: '22px'}}/>}

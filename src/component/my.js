@@ -10,7 +10,7 @@ import {
     Icon,
     Flex,
     TextareaItem,
-    NoticeBar
+    NoticeBar, Toast
 } from "antd-mobile";
 
 
@@ -240,6 +240,10 @@ class My extends Base {
                     {text: '取消', style: 'default'},
                     {
                         text: '确定', onPress: () => {
+                            if (this.decimalValue.state.value > 18) {
+                                Toast.info('decimal <= 18', 1);
+                                return;
+                            }
                             pAbi.setDecimals(this.state.pk, this.state.mainPKr, this.decimalValue.state.value, catg, opt.props.ticket);
                         }
                     },

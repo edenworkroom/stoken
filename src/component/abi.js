@@ -39,6 +39,7 @@ export class Abi {
         let self = this;
         seropp.getAccountDetail(pk, function (item) {
             let tickets = new Map();
+
             if (item.Tickets.has("COIN1")) {
                 item.Tickets.get("COIN1").forEach(item => {
                     tickets.set(item, "COIN1");
