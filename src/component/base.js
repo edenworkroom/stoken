@@ -29,7 +29,7 @@ export default class Base extends Component {
         let self = this;
         abi.init.then(() => {
             if (self._componentDidMount) {
-                self._componentDidMount();
+                self._componentDidMount(this.state.pk);
             }
             self.init();
             self.timer = setInterval(function () {
