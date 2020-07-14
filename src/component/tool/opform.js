@@ -3,87 +3,80 @@ import {Storage, LinkedListStorage} from '../../database/localstorage'
 import {Flex, Modal, Button, WhiteSpace, List, InputItem, TextareaItem, WingBlank, Toast, NavBar} from 'antd-mobile';
 
 import {createForm} from 'rc-form';
-import {Cabi} from "./cabi";
-import abi from '../abi';
+import {Contract} from "./contract";
+
+import Abi from "../abi";
 
 const operation = Modal.operation;
+const abi = new Abi();
 
 class OpContractForm extends Component {
+
     constructor(props) {
         super(props);
         this.db = Storage;
         this.db = new LinkedListStorage("SC", Storage);
+        this.state = {contract: null, contracts: []}
+    }
 
-        let contracts = new Map();
-        let defaultContract;
-        let that = this;
+
+    loadContracts() {
+        let contracts = [];
         this.db.forEach(function (item, key) {
-            if (!defaultContract) {
-                defaultContract = key;
-            }
-            const abi = JSON.parse(item.abi);
-            contracts.set(key, {name: item.name, abi: abi, address: key});
+            const abis = JSON.parse(item.abi);
+            contracts.push({name: item.name, abis: abis, address: key})
         });
-
-        let accounts = new Map()
-        this.state = {
-            contract: defaultContract,
-            contracts: contracts
-        }
+        return contracts;
     }
 
     componentDidMount() {
-        let that = this;
-        let accounts = new Map();
-        let defaultAccount = "";
-
-
-        abi.accountList(function (data) {
-            data.forEach(function (item, index) {
-                if (index == 0) {
-                    defaultAccount = item.PK;
-                }
-                accounts.set(item.PK, {name: item.Name, balances: item.Balance})
-            });
-            that.setState({accounts: accounts, account: defaultAccount})
-        });
+        let list = this.loadContracts();
+        if (list.length > 0) {
+            this.setState({contract: list[0], contracts: list})
+        } else {
+            this.setState({contracts: list})
+        }
     }
 
-    formatAccount = (pk, amount) => {
+    formatAccount = (mainPKr, amount) => {
         if (!amount) {
             amount = 0;
         }
-        if (pk) {
-            return pk.slice(0, 6) + "...." + pk.slice(-6) + " (" + amount + ")"
+        if (mainPKr) {
+            return mainPKr.slice(0, 10) + "...." + mainPKr.slice(-10) + " (" + amount + ")"
         }
     }
 
     showAccountList = () => {
         let self = this;
         let options = [];
-        this.state.accounts.forEach(function (item, pk) {
-            let balance = item.balances["SERO"];
-            if (!balance) {
-                balance = 0;
-            }
-            let text = self.formatAccount(pk, balance);
-            options.push({
-                text: item.name + ":" + text, onPress: () => {
-                    self.props.form.setFieldsValue({"account": pk});
-                    self.setState({account: pk});
+        abi.accountList(function (accounts) {
+            accounts.forEach(function (account) {
+                let balance = account.balances["SERO"];
+                if (!balance) {
+                    balance = 0;
                 }
+                let text = self.formatAccount(account.mainPKr, balance);
+                options.push({
+                    text: account.name + ":" + text, onPress: () => {
+                        self.props.form.setFieldsValue({"account": account.pk});
+                        self.setState({account: account});
+                    }
+                });
             });
-        });
-        operation(options);
+            operation(options);
+        })
     }
 
     showContractList = () => {
-        let options = [];
         let self = this;
-        this.state.contracts.forEach(function (item, address) {
+        let contracts = this.loadContracts()
+        let options = [];
+
+        contracts.forEach(function (item, index) {
             options.push({
-                text: item.name + ":" + address, onPress: () => {
-                    self.setState({contract: address})
+                text: item.name + ":" + item.address.slice(0, 10), onPress: () => {
+                    self.setState({contract: item, contracts: contracts})
                 }
             })
         });
@@ -91,7 +84,6 @@ class OpContractForm extends Component {
     }
 
     render() {
-        let contract = this.state.contracts.get(this.state.contract);
         return (
             <div style={{padding: '15px 0'}}>
                 <WingBlank>
@@ -101,10 +93,10 @@ class OpContractForm extends Component {
                             this.props.form.getFieldDecorator('account', {
                                 rules: [{required: true,}], initialValue: this.state.account
                             })(
-                                <InputItem
-                                    onClick={this.showAccountList}
-                                    name="account"
-                                ></InputItem>
+                                <InputItem placeholder="pkr"
+                                           onClick={this.showAccountList}
+                                           name="account"
+                                >account</InputItem>
                             )
                         }
                         {
@@ -133,14 +125,14 @@ class OpContractForm extends Component {
 
                     <WhiteSpace size="md"/>
                     <List renderHeader={() => '选择合约'}>
-                        <Button onClick={this.showContractList}>{this.state.contract}</Button>
+                        <Button
+                            onClick={this.showContractList.bind(this)}>{this.state.contract && this.state.contract.address}</Button>
                     </List>
                     <WhiteSpace/>
                 </WingBlank>
 
-                {contract && contract.abi &&
-                <Cabi contract={contract} abi={contract.abi} accountForm={this.props.form}/>
-                }
+                {this.state.contract && <Contract abis={this.state.contract.abis} addresss={this.state.contract.address}
+                                                  accountForm={this.props.form}/>}
 
                 <WhiteSpace/>
             </div>

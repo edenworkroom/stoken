@@ -14,6 +14,7 @@ import language from "./component/language";
 import {showPK} from "./component/common";
 import Abi from "./component/abi";
 import TokenList from "./component/list";
+import Tools from "./component/tool/tools";
 
 const abi = new Abi();
 
@@ -132,36 +133,36 @@ class App extends Component {
                         {this.renderContent("my", this.state.pk, this.state.selectedTab === 'my')}
                     </TabBar.Item>
 
-                    {/*<TabBar.Item title="工具" key="tool"*/}
-                    {/*             selected={this.state.selectedTab === 'tool'}*/}
-                    {/*             icon={<img src={my_0} style={{width: '22px', height: '22px'}}/>}*/}
-                    {/*             selectedIcon={<img src={my_1}*/}
-                    {/*                                style={{width: '22px', height: '22px'}}/>}*/}
-                    {/*             onPress={() => {*/}
-                    {/*                 this.setState({selectedTab: "tool"})*/}
-                    {/*             }}*/}
-                    {/*>*/}
-                    {/*    <Carousel*/}
-                    {/*        autoplay={false}*/}
-                    {/*        infinite*/}
-                    {/*        beforeChange={(from, to) => console.log(`slide from ${from} to ${to}`)}*/}
-                    {/*        afterChange={index => console.log('slide to', index)}*/}
-                    {/*    >*/}
-                    {/*        {([<LoadContract/>, <OpContract/>])}*/}
-                    {/*    </Carousel>*/}
-                    {/*</TabBar.Item>*/}
-
-                    <TabBar.Item title="列表" key="list"
-                                 selected={this.state.selectedTab === 'list'}
-                                 icon={<img src={require('./icon/list_0.png')} style={{width: '22px', height: '22px'}}/>}
-                                 selectedIcon={<img src={require('./icon/list_1.png')}
+                    <TabBar.Item title="工具" key="tool"
+                                 selected={this.state.selectedTab === 'tool'}
+                                 icon={<img src={my_0} style={{width: '22px', height: '22px'}}/>}
+                                 selectedIcon={<img src={my_1}
                                                     style={{width: '22px', height: '22px'}}/>}
                                  onPress={() => {
-                                     this.setState({selectedTab: "list"})
+                                     this.setState({selectedTab: "tool"})
                                  }}
                     >
-                        {this.renderContent("list", this.state.pk, this.state.selectedTab === 'list')}
+                        <Carousel
+                            autoplay={false}
+                            infinite
+                            beforeChange={(from, to) => console.log(`slide from ${from} to ${to}`)}
+                            afterChange={index => console.log('slide to', index)}
+                        >
+                            {<Tools/>}
+                        </Carousel>
                     </TabBar.Item>
+
+                    {/*<TabBar.Item title="列表" key="list"*/}
+                    {/*             selected={this.state.selectedTab === 'list'}*/}
+                    {/*             icon={<img src={require('./icon/list_0.png')} style={{width: '22px', height: '22px'}}/>}*/}
+                    {/*             selectedIcon={<img src={require('./icon/list_1.png')}*/}
+                    {/*                                style={{width: '22px', height: '22px'}}/>}*/}
+                    {/*             onPress={() => {*/}
+                    {/*                 this.setState({selectedTab: "list"})*/}
+                    {/*             }}*/}
+                    {/*>*/}
+                    {/*    {this.renderContent("list", this.state.pk, this.state.selectedTab === 'list')}*/}
+                    {/*</TabBar.Item>*/}
                     <TabBar.Item title="帮助" key="help"
                                  selected={this.state.selectedTab === 'help'}
                                  icon={<img src={help_0} style={{width: '22px', height: '22px'}}/>}

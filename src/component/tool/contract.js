@@ -3,23 +3,25 @@ import {List, Item, Button, Flex, InputItem, WingBlank, WhiteSpace} from "antd-m
 import {createForm} from 'rc-form';
 
 import serojs from 'serojs'
-import abi from '../abi';
+import Abi from '../abi';
 
 const BigNumber = require('bignumber.js');
 const one = new BigNumber("1000000000000000000")
+const abi = new Abi();
 
 class Input extends Component {
     constructor(props) {
         super(props);
-        this.valueDecorator = this.props.form.getFieldDecorator(props.input.name, {
+        console.log("Input", props.name);
+        this.valueDecorator = this.props.form.getFieldDecorator(props.name, {
             rules: [],
         });
     }
 
     render() {
+        const {name, type} = this.props;
         return this.valueDecorator(
-            <InputItem key={this.props.input.name} type="text" name={this.props.input.name}
-                       placeholder={this.props.input.type}>{this.props.input.name}</InputItem>
+            <InputItem key={name} type="text" name={name} placeholder={type}>{name}:</InputItem>
         )
     }
 }
@@ -48,6 +50,7 @@ class MethodForm extends Component {
 
     submit() {
         let self = this;
+        let contract = this.props.contract;
         let from = "";
         let amount = "0";
         let gasLimit = "0";
@@ -68,13 +71,14 @@ class MethodForm extends Component {
             })
         });
 
-        let contract = serojs.callContract(this.props.contract.abi, this.props.contract.address);
+
 
         try {
             let packData = "";
             if (this.props.method.name) {
                 packData = contract.packData(this.props.method.name, args);
             }
+
             let executeData = {
                 from: from,
                 to: this.props.contract.address,
@@ -104,12 +108,18 @@ class MethodForm extends Component {
         if (this.props.method.inputs) {
             inputItems = this.props.method.inputs.map(
                 (input) => {
-                    return <Input key={input.name} input={input} form={self.props.form}/>
+                    if(!input.name) {
+                       console.log(input)
+                        return ""
+                    }
+                    return <Input type={input.type} name={input.name} form={self.props.form}/>
                 }
             );
         }
 
+        let view = self.props.method.stateMutability == "view";
         return (
+
             <div className="abi">
                 <WhiteSpace/>
                 <List>
@@ -118,10 +128,10 @@ class MethodForm extends Component {
                             {methodName}
                         </div>
                         <div style={{float: 'right'}}>
-                            <Button onClick={() => this.submit()} type="primary"
+                            <Button onClick={() => this.submit()} type={view ?"primary":"warning"}
                                     inline size="small"
                                     style={{marginRight: '4px'}}>
-                                {self.props.method.constant ? "call" : "transact"}
+                                {view ? "call" : "transact"}
                             </Button>
                         </div>
                     </List.Item>
@@ -138,23 +148,25 @@ class MethodForm extends Component {
 
 const MForm = createForm()(MethodForm)
 
-export class Cabi extends Component {
+export class Contract extends Component {
 
     constructor(props) {
         super(props);
+
     }
 
     render() {
+        let contract = serojs.callContract(this.props.abis, this.props.address);
         let callItems = [];
         let transactItems = [];
         let self = this;
-        self.props.abi.forEach(function (item, index) {
+        self.props.abis.forEach(function (item, index) {
             if (item.type != "constructor" && item.type != "event") {
-                if (item.constant) {
-                    callItems.push(<MForm key={index} contract={self.props.contract} method={item}
+                if (item.stateMutability === "view") {
+                    callItems.push(<MForm key={index} contract={contract} method={item}
                                           accountForm={self.props.accountForm}/>)
                 } else {
-                    transactItems.push(<MForm key={index} contract={self.props.contract} method={item}
+                    transactItems.push(<MForm key={index} contract={contract} method={item}
                                               accountForm={self.props.accountForm}/>)
                 }
             }

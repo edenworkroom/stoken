@@ -15,14 +15,13 @@ import {
 
 
 import sAbi from './sellabi';
-import language from './language'
 import auction from "../icon/auction.png";
 import transfer from "../icon/transfer.png";
 import burning from "../icon/burning.png";
 import sell from "../icon/sell.png";
 import give from "../icon/give.png";
 import BigNumber from 'bignumber.js'
-import {showPK, showToken, showValueP} from "./common";
+import {showToken, showValueP} from "./common";
 import Base from './base'
 import {pAbi3, pAbi1} from './platformabi';
 
