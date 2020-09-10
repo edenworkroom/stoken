@@ -2,6 +2,9 @@ import serojs from 'serojs'
 import seropp from 'sero-pp'
 import BigNumber from 'bignumber.js'
 import {Toast} from "antd-mobile";
+import {JsonRpc} from "./utils/jsonrpc";
+
+const rpc = new JsonRpc();
 
 const config = {
     name: "S Token",
@@ -34,6 +37,23 @@ export class Abi {
             callback(info.language);
         });
     }
+
+    getDecimals(currency, callback) {
+        seropp.getInfo(function (info) {
+            rpc.seroRpc(info.rpc, "sero_getDecimal", [currency], function (rets) {
+                callback(rets);
+            });
+        });
+    }
+
+    getFullAddress(pkrs, callback) {
+        seropp.getInfo(function (info) {
+            rpc.seroRpc(info.rpc, "sero_getFullAddress", [pkrs], function (rets) {
+                callback(rets);
+            });
+        });
+    }
+
 
     accountDetails(pk, callback) {
         let self = this;
@@ -82,6 +102,28 @@ export class Abi {
     }
 
 
+    callMethodEx(contract, _method, from, _args, callback) {
+        let that = this;
+        let packData = contract.packData(_method, _args);
+        let callParams = {
+            from: from,
+            to: contract.address,
+            data: packData
+        };
+
+        seropp.call(callParams, function (callData) {
+            if (callData !== "0x0") {
+                let res = contract.unPackDataEx(_method, callData);
+                if (callback) {
+                    callback(res);
+                }
+            } else {
+                callback("0x0");
+            }
+        });
+    }
+
+
     callMethod(contract, _method, from, _args, callback) {
         let that = this;
         let packData = contract.packData(_method, _args);
@@ -92,7 +134,7 @@ export class Abi {
         };
 
         seropp.call(callParams, function (callData) {
-            if (callData !== "0x") {
+            if (callData !== "0x0") {
                 let res = contract.unPackData(_method, callData);
                 if (callback) {
                     callback(res);
@@ -131,15 +173,49 @@ export class Abi {
             catg: category,
             tkt: ticket
         };
+        console.log("estimateParam", estimateParam);
 
         seropp.estimateGas(estimateParam, function (gas, error) {
             if (error) {
+                console.log("error", error)
                 Toast.fail("Failed to execute smart contract")
             } else {
                 executeData["gas"] = gas;
                 seropp.executeContract(executeData, function (res, error) {
                     if (callback) {
                         callback(res)
+                    }
+                })
+            }
+        });
+    }
+
+    deploy(pk, mainPKr, abi, data, args, value, currency, callback) {
+        const createContract = serojs.createContract(abi, data)
+        const createData = createContract.encodeConstructorParams(args)
+        let executeData = {
+            from: pk,
+            value: "0x" + value.toString(16),
+            data: createData,
+            gasPrice: "0x" + new BigNumber("1000000000").toString(16),
+            cy: currency,
+        };
+        let estimateParam = {
+            from: mainPKr,
+            value: "0x" + value.toString(16),
+            data: createData,
+            gasPrice: "0x" + new BigNumber("1000000000").toString(16),
+            cy: currency,
+        };
+
+        seropp.estimateGas(estimateParam, function (gas, error) {
+            if (error) {
+            } else {
+                executeData["gas"] = gas;
+                seropp.executeContract(executeData, function (res, error) {
+                    if (error) {
+                    } else {
+                        callback(res);
                     }
                 })
             }

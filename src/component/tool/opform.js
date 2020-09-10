@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {Storage, LinkedListStorage} from '../../database/localstorage'
 import {Flex, Modal, Button, WhiteSpace, List, InputItem, TextareaItem, WingBlank, Toast, NavBar} from 'antd-mobile';
-
 import {createForm} from 'rc-form';
 import {Contract} from "./contract";
 
@@ -16,9 +15,24 @@ class OpContractForm extends Component {
         super(props);
         this.db = Storage;
         this.db = new LinkedListStorage("SC", Storage);
-        this.state = {contract: null, contracts: []}
+
+        let contract = null;
+        if (props.contract) {
+            let item = this.db.get(props.contract);
+            contract = {name: item.name, abis: JSON.parse(item.abi), address: props.contract}
+        }
+
+        this.state = {contract: contract, contracts: [], account: {}}
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.contract !== this.props.contract) {
+            let item = this.db.get(nextProps.contract);
+            let contract = {name: item.name, abis: JSON.parse(item.abi), address: nextProps.contract}
+            console.log("componentWillReceiveProps", contract);
+            this.setState({contract: contract})
+        }
+    }
 
     loadContracts() {
         let contracts = [];
@@ -30,20 +44,25 @@ class OpContractForm extends Component {
     }
 
     componentDidMount() {
-        let list = this.loadContracts();
-        if (list.length > 0) {
-            this.setState({contract: list[0], contracts: list})
-        } else {
-            this.setState({contracts: list})
-        }
+        let self = this;
+        abi.init
+            .then(() => {
+                abi.accountList(function (accounts) {
+                    let list = self.loadContracts();
+                    if (list.length > 0) {
+                        self.setState({
+                            contract: list[0], contracts: list, account: accounts[0]
+                        })
+                    } else {
+                        self.setState({contracts: list, account: accounts[0]})
+                    }
+                });
+            });
     }
 
-    formatAccount = (mainPKr, amount) => {
-        if (!amount) {
-            amount = 0;
-        }
+    formatAccount = (mainPKr, name) => {
         if (mainPKr) {
-            return mainPKr.slice(0, 10) + "...." + mainPKr.slice(-10) + " (" + amount + ")"
+            return name + " " + mainPKr.slice(0, 10) + "...." + mainPKr.slice(-5)
         }
     }
 
@@ -59,7 +78,6 @@ class OpContractForm extends Component {
                 let text = self.formatAccount(account.mainPKr, balance);
                 options.push({
                     text: account.name + ":" + text, onPress: () => {
-                        self.props.form.setFieldsValue({"account": account.pk});
                         self.setState({account: account});
                     }
                 });
@@ -88,51 +106,35 @@ class OpContractForm extends Component {
             <div style={{padding: '15px 0'}}>
                 <WingBlank>
                     <WhiteSpace/>
-                    <List renderHeader={() => '选择账号'}>
-                        {
-                            this.props.form.getFieldDecorator('account', {
-                                rules: [{required: true,}], initialValue: this.state.account
-                            })(
-                                <InputItem placeholder="pkr"
-                                           onClick={this.showAccountList}
-                                           name="account"
-                                >account</InputItem>
-                            )
-                        }
-                        {
-                            this.props.form.getFieldDecorator('value', {
-                                rules: []
-                            })(
-                                <InputItem
-                                    type="text"
-                                    name="value"
-                                    placeholder="value"
-                                >value</InputItem>
-                            )
-                        }
-                        {
-                            this.props.form.getFieldDecorator('gasLimit', {
-                                rules: []
-                            })(
-                                <InputItem
-                                    type="text"
-                                    name="gasLimit"
-                                    placeholder="gasLimit"
-                                >gasLimit</InputItem>
-                            )
-                        }
-                    </List>
+                    <Flex style={{paddingTop: '15px'}}>
+                        <Flex.Item style={{flex: 80, padding: '0px 15px'}}>
+                            <span>账号 : {this.formatAccount(this.state.account.mainPKr, this.state.account.name)}</span>
+                        </Flex.Item>
+                        <Flex.Item style={{flex: 20}}>
+                            <div><a onClick={() => {
+                                this.showAccountList()
+                            }}>切换账号</a></div>
+                        </Flex.Item>
+                    </Flex>
 
                     <WhiteSpace size="md"/>
-                    <List renderHeader={() => '选择合约'}>
-                        <Button
-                            onClick={this.showContractList.bind(this)}>{this.state.contract && this.state.contract.address}</Button>
-                    </List>
+
+                    <Flex style={{paddingTop: '15px'}}>
+                        <Flex.Item style={{flex: 80, padding: '0px 15px'}}>
+                            <span>合约 : {this.state.contract && this.state.contract.name}</span>
+                        </Flex.Item>
+                        <Flex.Item style={{flex: 20}}>
+                            <div><a onClick={() => {
+                                this.showContractList()
+                            }}>切换合约</a></div>
+                        </Flex.Item>
+                    </Flex>
                     <WhiteSpace/>
                 </WingBlank>
 
-                {this.state.contract && <Contract abis={this.state.contract.abis} addresss={this.state.contract.address}
-                                                  accountForm={this.props.form}/>}
+                {this.state.contract && <Contract account={this.state.account}
+                                                  abis={this.state.contract.abis}
+                                                  address={this.state.contract.address}/>}
 
                 <WhiteSpace/>
             </div>

@@ -1,18 +1,19 @@
 import React, {Component} from 'react';
-import {List, Item, Button, Flex, InputItem, WingBlank, WhiteSpace} from "antd-mobile";
+import {Modal, Item, Button, Flex, InputItem, WingBlank, WhiteSpace, Card, TextareaItem} from "antd-mobile";
 import {createForm} from 'rc-form';
-
+import 'semantic-ui-css/semantic.min.css';
 import serojs from 'serojs'
 import Abi from '../abi';
+import BigNumber from 'bignumber.js'
+import {prettyFormat} from '../common.js'
 
-const BigNumber = require('bignumber.js');
-const one = new BigNumber("1000000000000000000")
+const one = new BigNumber("1000000000000000000");
 const abi = new Abi();
+const alert = Modal.alert;
 
 class Input extends Component {
     constructor(props) {
         super(props);
-        console.log("Input", props.name);
         this.valueDecorator = this.props.form.getFieldDecorator(props.name, {
             rules: [],
         });
@@ -21,7 +22,10 @@ class Input extends Component {
     render() {
         const {name, type} = this.props;
         return this.valueDecorator(
-            <InputItem key={name} type="text" name={name} placeholder={type}>{name}:</InputItem>
+            <div className="field">
+                <label>{name}</label>
+                <input key={name} type="text" placeholder={type} ref={el => this.valueDecorators = el}/>
+            </div>
         )
     }
 }
@@ -31,116 +35,126 @@ class MethodForm extends Component {
         super(props);
     }
 
-    execute(executeData, contract) {
-        let self = this;
-        if (self.props.method.constant) {
-            abi.call(executeData, function (callData) {
-                if (callData !== "0x") {
-                    let res = contract.unPackData(self.props.method.name, callData);
-                    self.refs.result.innerHTML = res
-                }
-            });
-
-        } else {
-            abi.executeContract(executeData, function (res) {
-                self.refs.result.innerHTML = res
-            })
-        }
-    }
-
     submit() {
         let self = this;
-        let contract = this.props.contract;
-        let from = "";
-        let amount = "0";
-        let gasLimit = "0";
-        self.props.accountForm.validateFields((error, value) => {
-            from = value["account"];
+        const {account, contract, method} = this.props;
+        let args = [];
+        let value = 0;
+        let currency = "SERO";
+        self.props.form.validateFields((error, value) => {
             if (value["value"]) {
-                amount = value["value"];
+                value = new BigNumber(value["value"]).multipliedBy(one);
             }
-            if (value["gasLimit"]) {
-                gasLimit = value["gasLimit"];
+            if (value["currency"]) {
+                currency = value["currency"];
             }
 
-        });
-        let args = [];
-        self.props.form.validateFields((error, value) => {
-            this.props.method.inputs.forEach((item) => {
-                args.push(value[item.name])
+            method.inputs.forEach((item) => {
+                if (value[item.name]) {
+                    args.push(value[item.name])
+                } else if (value[item.type]) {
+                    args.push(value[item.typetype])
+                } else {
+                    args.push(null)
+                }
             })
         });
 
-
-
-        try {
-            let packData = "";
-            if (this.props.method.name) {
-                packData = contract.packData(this.props.method.name, args);
-            }
-
-            let executeData = {
-                from: from,
-                to: this.props.contract.address,
-                value: "0x" + new BigNumber(amount).multipliedBy(one).toString(16),
-                data: packData,
-            };
-
-            if (gasLimit === "0" && !self.props.method.constant) {
-                serojs.estimateGas(executeData, function (gasLimit) {
-                    executeData["gas"] = "0x" + new BigNumber(gasLimit).toString(16);
-                    self.execute(executeData, contract);
+        if (method.stateMutability == "view" || method.stateMutability == "pure") {
+            abi.callMethodEx(self.props.contract, method.name, account.mainPKr, args, function (ret) {
+                self.refs.result.innerHTML = JSON.stringify(ret[0]);
+            })
+        } else {
+            abi.executeMethod(self.props.contract, method.name, account.pk, account.mainPKr, args,
+                currency, value, null, null, function (ret) {
+                    self.refs.result.innerHTML = JSON.stringify(ret);
                 });
-            } else {
-                executeData["gas"] = "0x" + new BigNumber(gasLimit).toString(16);
-                self.execute(executeData, contract);
-            }
-        } catch (e) {
-            alert(e.message);
         }
     }
 
     render() {
-
         let self = this;
-        let methodName = this.props.method.name ? this.props.method.name : "fallback";
+        const {account, contract, method} = this.props;
+        let methodName = method.name ? method.name : "fallback";
         let inputItems;
-        if (this.props.method.inputs) {
-            inputItems = this.props.method.inputs.map(
-                (input) => {
-                    if(!input.name) {
-                       console.log(input)
-                        return ""
+        if (method.inputs) {
+            inputItems = method.inputs.map(
+                (method, index) => {
+                    console.log("method", method);
+                    if (!method.name) {
+                        // return <Input key={index} type={method.type} name={method.type} form={self.props.form}/>
+                    } else {
+                        return <Input key={index} type={method.type} name={method.name} form={self.props.form}/>
                     }
-                    return <Input type={input.type} name={input.name} form={self.props.form}/>
                 }
             );
         }
 
-        let view = self.props.method.stateMutability == "view";
-        return (
+        let view = method.stateMutability == "view" || method.stateMutability == "pure";
 
-            <div className="abi">
-                <WhiteSpace/>
-                <List>
-                    <List.Item>
-                        <div style={{float: 'left'}}>
-                            {methodName}
-                        </div>
-                        <div style={{float: 'right'}}>
-                            <Button onClick={() => this.submit()} type={view ?"primary":"warning"}
+        let options = []
+        if (method.stateMutability == "payable") {
+            account.balances.forEach((val, key) => {
+                options.push(<option key={key} value={key}>{key}</option>)
+            })
+            if (options.length == 0) {
+                options.push(<option key={"SERO"} value={"SERO"}>SERO</option>)
+            }
+        }
+
+        return (
+            <div className="item">
+                <Card>
+                    <Card.Header
+                        title={
+                            <Button onClick={() => this.submit()} type={view ? "primary" : "warning"}
                                     inline size="small"
                                     style={{marginRight: '4px'}}>
-                                {view ? "call" : "transact"}
+                                {methodName}
                             </Button>
-                        </div>
-                    </List.Item>
-                    <List.Item>
-                        {inputItems}
-                        <div ref="result" style={{paddingLeft: '15px'}}></div>
-                    </List.Item>
-                </List>
-                <WhiteSpace/>
+                        }
+                    />
+                    {
+                        (inputItems.length > 0 || method.stateMutability == "payable") && <Card.Body>
+                            <div className="ui form" style={{paddingLeft: '15px'}}>
+                                {inputItems.length > 0 && inputItems}
+                                {
+                                    method.stateMutability == "payable" &&
+                                    <div className="field">
+                                        <label>Value</label>
+                                        <div className="two fields">
+                                            <div className="field">
+                                                {
+                                                    this.props.form.getFieldDecorator('value', {
+                                                        rules: []
+                                                    })(<input type="text" name="value" placeholder="value"/>
+                                                    )
+                                                }
+
+                                            </div>
+                                            <div className="field">
+                                                <label>Currency</label>
+                                                {
+                                                    this.props.form.getFieldDecorator('currecny', {
+                                                        rules: [], initialValue: "SERO"
+                                                    })(
+                                                        <select className="ui search dropdown" name="currecny">
+                                                            {options}
+                                                        </select>
+                                                    )
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </Card.Body>
+                    }
+                    <Card.Footer content={<div ref="result" style={{
+                        paddingLeft: '15px', width: '100%', wordBreak: 'break-all'
+                    }}></div>}>
+                    </Card.Footer>
+                </Card>
             </div>
         )
     }
@@ -156,25 +170,28 @@ export class Contract extends Component {
     }
 
     render() {
-        let contract = serojs.callContract(this.props.abis, this.props.address);
+        const {account, abis, address} = this.props;
+        let contract = serojs.callContract(abis, address);
         let callItems = [];
         let transactItems = [];
         let self = this;
-        self.props.abis.forEach(function (item, index) {
-            if (item.type != "constructor" && item.type != "event") {
-                if (item.stateMutability === "view") {
-                    callItems.push(<MForm key={index} contract={contract} method={item}
+        self.props.abis.forEach(function (method, index) {
+            if (method.type != "constructor" && method.type != "event") {
+                if (method.stateMutability === "view" || method.stateMutability == "pure") {
+                    callItems.push(<MForm key={index} account={account} contract={contract} method={method}
                                           accountForm={self.props.accountForm}/>)
                 } else {
-                    transactItems.push(<MForm key={index} contract={contract} method={item}
+                    transactItems.push(<MForm key={index} account={account} contract={contract} method={method}
                                               accountForm={self.props.accountForm}/>)
                 }
             }
         });
         return (
             <WingBlank>
-                {callItems}
-                {transactItems}
+                <div className="ui list">
+                    {callItems}
+                    {transactItems}
+                </div>
             </WingBlank>
         )
     }

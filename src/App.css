@@ -37,7 +37,15 @@
   }
 }
 
-.am-modal-transparent {
-  width: auto;
-  min-width:270px;
+/*.am-modal-transparent {*/
+/*  width: auto;*/
+/*  min-width:270px;*/
+/*}*/
+
+.am-card {
+  min-height: unset !important;
+  padding-bottom: 6px;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
 }

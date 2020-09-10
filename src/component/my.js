@@ -10,9 +10,10 @@ import {
     Icon,
     Flex,
     TextareaItem,
-    NoticeBar, Toast
+    Toast,
+    Checkbox,
+    Tabs
 } from "antd-mobile";
-
 
 import sAbi from './sellabi';
 import auction from "../icon/auction.png";
@@ -25,6 +26,9 @@ import {showToken, showValueP} from "./common";
 import Base from './base'
 import {pAbi3, pAbi1} from './platformabi';
 
+import proxyAbi from './proxyabi';
+
+const AgreeItem = Checkbox.AgreeItem;
 const alert = Modal.alert;
 
 const operation = Modal.operation;
@@ -32,21 +36,39 @@ const operation = Modal.operation;
 class My extends Base {
 
     constructor(props) {
-        super(props);
+        super(props, {canMint: true, unableMint: true, setIndex: 0});
     }
 
-    sleep(ms) {
-        return new Promise(function (resolve, reject) {
-            setTimeout(resolve, ms);
-        })
+    _update(tokens, tickets) {
+        let self = this;
+        let update = false;
+        if (!self.state.tokens) {
+            update = true;
+        } else {
+            if (tokens.length == self.state.tokens.length) {
+                for (var i = 0; i < tokens.length; i++) {
+                    let a = tokens[i];
+                    let b = self.state.tokens[i];
+                    if (a.token != b.token || a.totalSupply != b.totalSupply || a.balance != b.balance || a.decimals != b.decimals) {
+                        update = true;
+                        break;
+                    }
+                }
+            } else {
+                update = true;
+            }
+        }
+        if (update) {
+            self.setState({tokens: tokens, tickets: tickets});
+        }
     }
 
     _init(pk) {
         let self = this;
-        pAbi3.accountDetails(pk, function (account) {
+        proxyAbi.accountDetails(pk, function (account) {
             let tickets1 = [];
             let tickets3 = [];
-
+            self.setState({mainPKr: account.mainPKr});
 
             let tickets = [];
             account.tickets.forEach(function (value, key) {
@@ -54,69 +76,57 @@ class My extends Base {
             });
 
             if (tickets.length == 0) {
-                if (self.state.tokens && self.state.tokens.length > 0) {
-                    self.setState({tokens: []});
-                }
-                return;
-            }
-
-            sAbi.hasTickets(account.mainPKr, tickets, function (flags) {
-                tickets = tickets.filter(function (currentValue, index) {
-                    return !flags[index];
-                });
-
-                if (tickets.length == 0) {
-                    if (self.state.tokens && self.state.tokens.length > 0) {
-                        self.setState({tokens: []});
-                    }
-                    return;
-                }
-
-                tickets.forEach(function (each) {
-                    if ("COIN1" === account.tickets.get(each)) {
-                        tickets1.push(each);
-                    } else if ("COIN3" === account.tickets.get(each)) {
-                        tickets3.push(each);
-                    }
-                });
-
-                pAbi3.tokens(account.mainPKr, tickets3, function (tokens3) {
+                proxyAbi.tokens(account.mainPKr, tickets3, function (tokens3) {
                     let tokens = [];
                     if (tokens3.length > 0) {
                         tokens.push.apply(tokens, tokens3);
                     }
-                    pAbi1.tokens(account.mainPKr, tickets1, function (tokens1) {
-                        if (tokens1.length > 0) {
-                            tokens1.forEach(function (each) {
-                                each.decimals = 0;
-                                each.catg = "COIN1";
-                                tokens.push(each);
-                            });
-                        }
+                    self._update(tokens, account.tickets);
+                });
+            } else {
+                sAbi.hasTickets(account.mainPKr, tickets, function (flags) {
+                    tickets = tickets.filter(function (currentValue, index) {
+                        return !flags[index];
+                    });
 
-                        let update = false;
-                        if (!self.state.tokens) {
-                            update = true;
-                        } else {
-                            if (tokens.length == self.state.tokens.length) {
-                                for (var i = 0; i < tokens.length; i++) {
-                                    let a = tokens[i];
-                                    let b = self.state.tokens[i];
-                                    if (a.token != b.token || a.totalSupply != b.totalSupply || a.balance != b.balance || a.decimals != b.decimals) {
-                                        update = true;
-                                        break;
-                                    }
-                                }
-                            } else {
-                                update = true;
-                            }
+                    if (tickets.length == 0) {
+                        if (self.state.tokens && self.state.tokens.length > 0) {
+                            self.setState({tokens: []});
                         }
-                        if (update) {
-                            self.setState({tokens: tokens, tickets: account.tickets});
+                        return;
+                    }
+
+                    tickets.forEach(function (each) {
+                        if ("COIN1" === account.tickets.get(each)) {
+                            tickets1.push(each);
+                        } else if ("COIN3" === account.tickets.get(each)) {
+                            tickets3.push(each);
+                        }
+                    });
+
+                    proxyAbi.tokens(account.mainPKr, tickets3, function (tokens3) {
+                        let tokens = [];
+                        if (tokens3.length > 0) {
+                            tokens.push.apply(tokens, tokens3);
+                        }
+                        if (tickets1.length > 0) {
+                            pAbi1.tokens(account.mainPKr, tickets1, function (tokens1) {
+                                if (tokens1.length > 0) {
+                                    tokens1.forEach(function (each) {
+                                        each.decimals = 0;
+                                        each.catg = "COIN1";
+                                        tokens.push(each);
+                                    });
+                                }
+                                self._update(tokens, account.tickets);
+
+                            });
+                        } else {
+                            self._update(tokens, account.tickets);
                         }
                     });
                 });
-            });
+            }
         });
     }
 
@@ -126,6 +136,20 @@ class My extends Base {
             <InputItem ref={el => this.tokenValue = el} placeholder="token name">币名</InputItem>
             <InputItem type="number" ref={el => this.decimalsValue = el} placeholder="decimals">精度</InputItem>
             <InputItem type="number" ref={el => this.supplyValue = el} placeholder="initialSupply">数量</InputItem>
+            <Flex>
+                <Flex.Item>
+                    <AgreeItem defaultChecked={this.state.canMint} ref={el => this.agree = el} onChange={e => {
+                        console.log(e.target.checked)
+                        this.setState({canMint: e.target.checked});
+                    }}>
+                        开启增发
+                        <br/>
+                        <a style={{fontSize: '8px', color: 'red'}}>
+                            选择不开启增发发币无增发功能,且不能在币名市场交易。
+                        </a>
+                    </AgreeItem>
+                </Flex.Item>
+            </Flex>
         </div>, [
             {text: '取消', style: 'default'},
             {
@@ -133,7 +157,7 @@ class My extends Base {
                     let token = this.tokenValue.state.value.toUpperCase();
                     let decimals = parseInt(this.decimalsValue.state.value);
                     let initialSupply = parseInt(this.supplyValue.state.value);
-                    pAbi3.createToken(self.state.pk, self.state.mainPKr, token, decimals, initialSupply);
+                    proxyAbi.createToken(self.state.pk, self.state.mainPKr, token, decimals, initialSupply, this.state.canMint);
                 }
             },
         ]);
@@ -144,7 +168,7 @@ class My extends Base {
             popoverVisible: false,
         });
         let catg = this.state.tickets.get(opt.props.ticket);
-        let pAbi = pAbi3;
+        let pAbi = proxyAbi;
         if (catg == "COIN1") {
             pAbi = pAbi1;
         }
@@ -181,7 +205,7 @@ class My extends Base {
                     {
                         text: '确定', onPress: () => {
                             let to = this.toValue.state.value;
-                            pAbi.give(this.state.pk, this.state.mainPKr, to, catg, opt.props.ticket);
+                            pAbi.give(this.state.pk, this.state.mainPKr, to, catg, opt.props.ticket, opt.props.canMint);
                         }
                     },
                 ]);
@@ -201,7 +225,7 @@ class My extends Base {
                         text: '确定', onPress: () => {
                             let value = new BigNumber(this.sendValue.state.value).multipliedBy(new BigNumber(10).pow(opt.props.decimals));
                             let to = this.toValue.state.value;
-                            pAbi.transfer(this.state.pk, this.state.mainPKr, to, value.toNumber(), catg, opt.props.ticket);
+                            pAbi.transfer(this.state.pk, this.state.mainPKr, to, value.toNumber(), catg, opt.props.ticket, opt.props.canMint);
                         }
                     },
                 ]);
@@ -216,7 +240,7 @@ class My extends Base {
                             let issues = new BigNumber(this.issuesValue.state.value).multipliedBy(new BigNumber(10).pow(opt.props.decimals));
                             pAbi.mintToken(this.state.pk, this.state.mainPKr, issues.toNumber(), catg, opt.props.ticket);
                         }
-                    },
+                    }
                 ]);
                 break;
             case "burning":
@@ -227,23 +251,50 @@ class My extends Base {
                     {
                         text: '确定', onPress: () => {
                             let supply = new BigNumber(this.supplyValue.state.value).multipliedBy(new BigNumber(10).pow(opt.props.decimals));
-                            pAbi.burnToken(this.state.pk, this.state.mainPKr, supply.toNumber(), catg, opt.props.ticket);
+                            pAbi.burnToken(this.state.pk, this.state.mainPKr, supply.toNumber(), catg, opt.props.ticket, opt.props.canMint);
                         }
                     },
                 ]);
                 break;
             case "reset":
-                alert('设置精度', <div>
-                    <InputItem type="number" ref={el => this.decimalValue = el} placeholder="decimal"/>
-                </div>, [
+                let title = "精度";
+                let msg = <InputItem type="number" ref={el => this.decimalValue = el} placeholder="decimal"/>
+                if (opt.props.canMint) {
+                    title = "";
+                    msg = <Tabs tabs={[
+                        {title: '精度', sub: '1'},
+                        {title: '增发', sub: '2'},
+                    ]} initialPage={this.state.setIndex} onChange={(tab, index) => {
+                        this.setState({setIndex: index});
+                    }}
+                    >
+                        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                            <InputItem type="number" ref={el => this.decimalValue = el} placeholder="decimal"/>
+                        </div>
+                        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                            <AgreeItem defaultChecked={this.state.unableMint} onChange={e => {
+                                this.setState({unableMint: e.target.checked});
+                            }}>
+                                关闭增发
+                            </AgreeItem>
+                        </div>
+                    </Tabs>
+                }
+                alert(title, msg, [
                     {text: '取消', style: 'default'},
                     {
                         text: '确定', onPress: () => {
-                            if (this.decimalValue.state.value > 18) {
-                                Toast.info('decimal <= 18', 1);
-                                return;
+                            if (this.state.setIndex == 0) {
+                                if (this.decimalValue.state.value > 18) {
+                                    Toast.info('decimal <= 18', 1);
+                                    return;
+                                }
+                                pAbi.setDecimals(this.state.pk, this.state.mainPKr, this.decimalValue.state.value, catg, opt.props.ticket, opt.props.canMint);
+                            } else if (opt.props.canMint) {
+                                if (this.state.unableMint) {
+                                    pAbi.setUnableMint(this.state.pk, this.state.mainPKr, opt.props.token, true, catg, opt.props.ticket);
+                                }
                             }
-                            pAbi.setDecimals(this.state.pk, this.state.mainPKr, this.decimalValue.state.value, catg, opt.props.ticket);
                         }
                     },
                 ]);
@@ -256,7 +307,7 @@ class My extends Base {
                     {
                         text: '确定', onPress: () => {
                             let value = new BigNumber(this.intoValue.state.value).multipliedBy(new BigNumber(10).pow(opt.props.decimals));
-                            pAbi.into(this.state.pk, this.state.mainPKr, opt.props.token, value);
+                            pAbi3.into(this.state.pk, this.state.mainPKr, opt.props.token, value);
                         }
                     },
                 ]);
@@ -287,22 +338,26 @@ class My extends Base {
                                                                data-seed="logId">拍卖</Popover.Item>),
                                                 (<Popover.Item key="5" value="sell" ticket={item.ticket}
                                                                token={item.token}
+                                                               disabled={item.totalSupply != item.balance || !item.canMint}
                                                                icon={<img src={sell} className="am-icon am-icon-xs"
                                                                           alt=""/>}
                                                                style={{whiteSpace: 'nowrap'}}>出售</Popover.Item>),
                                                 (<Popover.Item key="6" value="give" ticket={item.ticket}
                                                                token={item.token}
+                                                               canMint={item.canMint}
                                                                icon={<img src={give} className="am-icon am-icon-xs"
                                                                           alt=""/>}
                                                                style={{whiteSpace: 'nowrap'}}>转让</Popover.Item>),
                                                 (<Popover.Item key="7" value="transfer" ticket={item.ticket}
                                                                token={item.token} decimals={item.decimals}
+                                                               canMint={item.canMint}
                                                                icon={<img src={transfer}
                                                                           className="am-icon am-icon-xs"
                                                                           alt=""/>}
                                                                style={{whiteSpace: 'nowrap'}}>转账</Popover.Item>),
                                                 (<Popover.Item key="8" value="issues" ticket={item.ticket}
                                                                token={item.token} decimals={item.decimals}
+                                                               disabled={!item.canMint}
                                                                icon={<img src={require('../icon/issues.png')}
                                                                           className="am-icon am-icon-xs"
                                                                           alt=""/>}>
@@ -317,20 +372,21 @@ class My extends Base {
                                                 </Popover.Item>),
                                                 (<Popover.Item key="1" value="burning" ticket={item.ticket}
                                                                token={item.token} decimals={item.decimals}
+                                                               canMint={item.canMint}
                                                                icon={<img src={burning}
                                                                           className="am-icon am-icon-xs"
                                                                           alt=""/>}>
                                                     <span style={{marginRight: 5}}>销毁</span>
                                                 </Popover.Item>),
                                                 (<Popover.Item key="2" value="reset" ticket={item.ticket}
+                                                               token={item.token}
                                                                disabled={item.catg === "COIN1"}
+                                                               canMint={item.canMint}
                                                                icon={<img src={require('../icon/reset.png')}
                                                                           className="am-icon am-icon-xs"
                                                                           alt=""/>}>
                                                     <span style={{marginRight: 5}}>设置</span>
                                                 </Popover.Item>)
-
-
                                             ]}
                                             align={{
                                                 overflow: {adjustY: 0, adjustX: 0},

@@ -7,37 +7,28 @@ import {
 import LoadForm from "./loadform";
 import OpForm from "./opform";
 
-const tabs = [
-    { title: '添加', sub: '1' },
-    { title: '发布', sub: '2' },
-    { title: '操作', sub: '3' },
-];
+// const tabs = [
+//     {title: '添加', sub: '0'},
+//     {title: '操作', sub: '1'},
+// ];
 
 
 class Tools extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {contract: null, page: 0}
+    }
+
+    changeTab(contract) {
+        this.setState({contract: contract, page: 1})
     }
 
     render() {
         return (
-            <Tabs
-            tabs={tabs}
-                initialPage={1}
-                  onChange={(tab, index) => {
-                      console.log('onChange', index, tab);
-                  }}
-                  onTabClick={(tab, index) => {
-                      console.log('onTabClick', index, tab);
-                  }}>
-                <div>
-                    <LoadForm/>
-                </div>
-                <div>
-                    <OpForm/>
-                </div>
-            </Tabs>
+            <WingBlank size="md">
+                未来将提供Token相关工具，有建义可以联系客服 A7oyppt22
+            </WingBlank>
         )
     }
 }

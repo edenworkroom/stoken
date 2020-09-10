@@ -68,29 +68,38 @@ class App extends Component {
 
     renderContent(name, pk, show) {
         let content;
+        let showAccount = false;
         if (name === "market") {
             content = <Home pk={pk} show={show}/>
+            showAccount = true;
         } else if (name === "my") {
             content = <My pk={pk} show={show}/>
+            showAccount = true;
         } else if (name === "help") {
             content = <Help pk={pk} show={show}/>
-        }else if (name === "list") {
+        } else if (name === "list") {
             content = <TokenList pk={pk} show={show}/>
+        } else if (name === "tools") {
+            content = <Tools/>
+            return content;
         }
         return <div>
-            <WingBlank size="md">
-                <WhiteSpace/>
-                <Flex>
-                    <Flex.Item style={{flex: 85}}>
-                        <span>{language.e().home.account} : {this.state.name} {showPK(pk, 12)}</span>
-                    </Flex.Item>
-                    <Flex.Item style={{flex: 15}}>
-                        <div><a onClick={this.changAccount.bind(this)}>{language.e().home.change}</a></div>
-                    </Flex.Item>
-                </Flex>
-                <WhiteSpace/>
+            {
+                showAccount && <WingBlank size="md">
+                    <WhiteSpace/>
+                    <Flex>
+                        <Flex.Item style={{flex: 85}}>
+                            <span>{language.e().home.account} : {this.state.name} {showPK(pk, 12)}</span>
+                        </Flex.Item>
+                        <Flex.Item style={{flex: 15}}>
+                            <div><a onClick={this.changAccount.bind(this)}>{language.e().home.change}</a></div>
+                        </Flex.Item>
+                    </Flex>
+                    <WhiteSpace/>
 
-            </WingBlank>
+                </WingBlank>
+            }
+
             {content}
         </div>
     }
@@ -133,6 +142,18 @@ class App extends Component {
                         {this.renderContent("my", this.state.pk, this.state.selectedTab === 'my')}
                     </TabBar.Item>
 
+                    <TabBar.Item title="列表" key="list"
+                                 selected={this.state.selectedTab === 'list'}
+                                 icon={<img src={require('./icon/list_0.png')} style={{width: '22px', height: '22px'}}/>}
+                                 selectedIcon={<img src={require('./icon/list_1.png')}
+                                                    style={{width: '22px', height: '22px'}}/>}
+                                 onPress={() => {
+                                     this.setState({selectedTab: "list"})
+                                 }}
+                    >
+                        {this.renderContent("list", this.state.pk, this.state.selectedTab === 'list')}
+                    </TabBar.Item>
+
                     <TabBar.Item title="工具" key="tool"
                                  selected={this.state.selectedTab === 'tool'}
                                  icon={<img src={my_0} style={{width: '22px', height: '22px'}}/>}
@@ -142,27 +163,9 @@ class App extends Component {
                                      this.setState({selectedTab: "tool"})
                                  }}
                     >
-                        <Carousel
-                            autoplay={false}
-                            infinite
-                            beforeChange={(from, to) => console.log(`slide from ${from} to ${to}`)}
-                            afterChange={index => console.log('slide to', index)}
-                        >
-                            {<Tools/>}
-                        </Carousel>
+                        {this.renderContent("tools", this.state.pk, this.state.selectedTab === 'tools')}
                     </TabBar.Item>
 
-                    {/*<TabBar.Item title="列表" key="list"*/}
-                    {/*             selected={this.state.selectedTab === 'list'}*/}
-                    {/*             icon={<img src={require('./icon/list_0.png')} style={{width: '22px', height: '22px'}}/>}*/}
-                    {/*             selectedIcon={<img src={require('./icon/list_1.png')}*/}
-                    {/*                                style={{width: '22px', height: '22px'}}/>}*/}
-                    {/*             onPress={() => {*/}
-                    {/*                 this.setState({selectedTab: "list"})*/}
-                    {/*             }}*/}
-                    {/*>*/}
-                    {/*    {this.renderContent("list", this.state.pk, this.state.selectedTab === 'list')}*/}
-                    {/*</TabBar.Item>*/}
                     <TabBar.Item title="帮助" key="help"
                                  selected={this.state.selectedTab === 'help'}
                                  icon={<img src={help_0} style={{width: '22px', height: '22px'}}/>}

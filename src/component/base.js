@@ -5,12 +5,12 @@ const abi = new Abi();
 
 export default class Base extends Component {
 
-    constructor(props) {
+    constructor(props, state) {
         super(props);
-        this.state = {
+        this.state = Object.assign({
             pk: this.props.pk,
             show: this.props.show
-        }
+        }, state)
     }
 
     init(pk, show) {
@@ -20,8 +20,13 @@ export default class Base extends Component {
         if (!pk) {
             pk = this.state.pk;
         }
+
         if (this._init) {
+            let self = this;
             this._init(pk);
+            self.timer = setInterval(function () {
+                self._init();
+            }, 20 * 1000);
         }
     }
 
@@ -32,9 +37,6 @@ export default class Base extends Component {
                 self._componentDidMount(this.state.pk);
             }
             self.init();
-            self.timer = setInterval(function () {
-                self.init();
-            }, 20 * 1000);
         })
     }
 
