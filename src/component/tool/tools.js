@@ -1,33 +1,53 @@
 import React, {Component} from "react";
 import {
-    Button, Tabs,
-    WhiteSpace,
+    Button,
+    List, WhiteSpace,
     WingBlank,
 } from "antd-mobile";
-import LoadForm from "./loadform";
-import OpForm from "./opform";
-
-// const tabs = [
-//     {title: '添加', sub: '0'},
-//     {title: '操作', sub: '1'},
-// ];
+import Base from "../base";
+import DeployForm from "./deploy";
 
 
-class Tools extends Component {
+class Tools extends Base {
 
     constructor(props) {
-        super(props);
-        this.state = {contract: null, page: 0}
+        super(props,
+            {contract: null, page: 0, showList: true, choiced: null});
     }
 
-    changeTab(contract) {
-        this.setState({contract: contract, page: 1})
+    _componentDidMount(pk) {
+
     }
+
+    showList() {
+        return (
+            <List renderHeader={() => '工具'} className="my-list">
+                <List.Item arrow="horizontal" multipleLine onClick={() => {
+                    this.setState({showList: false, choiced: <DeployForm pk={this.state.pk}/>})
+                }}>
+                    部署合约
+                </List.Item>
+            </List>
+        )
+    }
+
 
     render() {
+        let content;
+        if (this.state.showList) {
+            content = this.showList();
+        } else {
+            content = this.state.choiced;
+        }
+
         return (
             <WingBlank size="md">
-                未来将提供Token相关工具，有建义可以联系客服 A7oyppt22
+                {
+                    this.state.showList == false && <Button onClick={() => {
+                        this.setState({showList: true, choiced: null})
+                    }}>BACK</Button>
+                }
+                {content}
             </WingBlank>
         )
     }

@@ -80,8 +80,8 @@ class App extends Component {
         } else if (name === "list") {
             content = <TokenList pk={pk} show={show}/>
         } else if (name === "tools") {
-            content = <Tools/>
-            return content;
+            content = <Tools pk={pk}/>
+            showAccount = true;
         }
         return <div>
             {
@@ -144,7 +144,8 @@ class App extends Component {
 
                     <TabBar.Item title="列表" key="list"
                                  selected={this.state.selectedTab === 'list'}
-                                 icon={<img src={require('./icon/list_0.png')} style={{width: '22px', height: '22px'}}/>}
+                                 icon={<img src={require('./icon/list_0.png')}
+                                            style={{width: '22px', height: '22px'}}/>}
                                  selectedIcon={<img src={require('./icon/list_1.png')}
                                                     style={{width: '22px', height: '22px'}}/>}
                                  onPress={() => {
@@ -154,17 +155,17 @@ class App extends Component {
                         {this.renderContent("list", this.state.pk, this.state.selectedTab === 'list')}
                     </TabBar.Item>
 
-                    <TabBar.Item title="工具" key="tool"
-                                 selected={this.state.selectedTab === 'tool'}
-                                 icon={<img src={my_0} style={{width: '22px', height: '22px'}}/>}
-                                 selectedIcon={<img src={my_1}
-                                                    style={{width: '22px', height: '22px'}}/>}
-                                 onPress={() => {
-                                     this.setState({selectedTab: "tool"})
-                                 }}
-                    >
-                        {this.renderContent("tools", this.state.pk, this.state.selectedTab === 'tools')}
-                    </TabBar.Item>
+                    {/*<TabBar.Item title="工具" key="tools"*/}
+                    {/*             selected={this.state.selectedTab === 'tools'}*/}
+                    {/*             icon={<img src={my_0} style={{width: '22px', height: '22px'}}/>}*/}
+                    {/*             selectedIcon={<img src={my_1}*/}
+                    {/*                                style={{width: '22px', height: '22px'}}/>}*/}
+                    {/*             onPress={() => {*/}
+                    {/*                 this.setState({selectedTab: "tools"})*/}
+                    {/*             }}*/}
+                    {/*>*/}
+                    {/*    {this.renderContent("tools", this.state.pk, this.state.selectedTab === 'tools')}*/}
+                    {/*</TabBar.Item>*/}
 
                     <TabBar.Item title="帮助" key="help"
                                  selected={this.state.selectedTab === 'help'}

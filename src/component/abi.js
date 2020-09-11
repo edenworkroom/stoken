@@ -190,8 +190,8 @@ export class Abi {
         });
     }
 
-    deploy(pk, mainPKr, abi, data, args, value, currency, callback) {
-        const createContract = serojs.createContract(abi, data)
+    deploy(pk, mainPKr, abi, code, args, value, currency, callback) {
+        const createContract = serojs.createContract(abi, code)
         const createData = createContract.encodeConstructorParams(args)
         let executeData = {
             from: pk,
@@ -207,6 +207,8 @@ export class Abi {
             gasPrice: "0x" + new BigNumber("1000000000").toString(16),
             cy: currency,
         };
+
+        console.log(estimateParam, executeData)
 
         seropp.estimateGas(estimateParam, function (gas, error) {
             if (error) {

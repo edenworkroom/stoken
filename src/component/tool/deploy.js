@@ -1,79 +1,100 @@
 import React, {Component} from 'react';
-import {Storage, LinkedListStorage} from '../../database/localstorage'
 import {NavBar, Modal, Button, WhiteSpace, List, InputItem, TextareaItem, WingBlank, Toast, Flex} from 'antd-mobile';
-import {createForm} from 'rc-form';
 
+import {createForm} from 'rc-form';
 import Abi from "../abi";
+import BigNumber from "bignumber.js";
 
 const abi = new Abi();
 
 class Deploy extends Component {
     constructor(props) {
         super(props);
-        this.db = new LinkedListStorage("SC", Storage);
-        this.nameDecorator = this.props.form.getFieldDecorator('name', {
-            rules: [{required: true}],
-        });
-        this.codeDecorator = this.props.form.getFieldDecorator('code', {
-            rules: [{required: true,}],
-        });
-        this.abiDecorator = this.props.form.getFieldDecorator('abi', {
-            rules: [{required: true}],
-        });
-
-        this.state = {contracts: this.listContracts()};
-    }
-
-    listContracts() {
-        let contracts = [];
-        this.db.forEach(function (item, key) {
-            const abis = JSON.parse(item.abi);
-            contracts.push({name: item.name, abis: abis, address: key})
-        });
-        return contracts;
+        this.state = {pk: props.pk, inputs: []}
     }
 
     componentDidMount() {
+        let self = this;
+        abi.init.then(() => {
+            abi.accountDetails(this.state.pk, function (account) {
+                self.setState({account: account});
+            })
+        })
     }
 
     submit() {
-        let self = this;
+        let _abi = this.abi.value;
+        let code = this.code.value;
+        let args = "41cx7DsTN7kGwdNHdTLg9AxgXH2LTkbS8kpohrS5QDygaU9z6wmh9vetBeVKrSWw2kwFuuFajVRWsz7oaQVrsQWE";
+        // this.props.form.validateFields((error, values) => {
+        //     console.log(values)
+        //     this.state.inputs.forEach((item) => {
+        //         args.push(values[item.name]);
+        //     })
+        // })
 
+        console.log(_abi, code, args, this.state.account);
+
+        abi.deploy(this.state.account.pk, this.state.account.mainPKr, JSON.parse(_abi), code, args, 0, "", function (ret) {
+            console.log(ret);
+        })
     }
 
     render() {
-        const {getFieldProps} = this.props.form;
-        let list = this.state.contracts.map((item, index) => {
-            return <List.Item key={index}>
-                <Flex>
-                    <Flex.Item style={{flex: 1}}>{item.name}</Flex.Item>
-                    <Flex.Item style={{flex: 4}}>{item.address.slice(0, 10) + ".." + item.address.slice(-5)}</Flex.Item>
-                    <Flex.Item style={{flex: 1}}><Button inline size="small" onClick={() => {
-                        this.db.remove(item.address);
-                        this.setState({contracts: this.listContracts()});
-                    }}>
-                        删除
-                    </Button></Flex.Item>
-                </Flex>
-            </List.Item>
-        })
+        let self = this;
+        const {getFieldDecorator, getFieldProps} = this.props.form;
         return (
             <div style={{padding: '15px 0'}}>
                 <WingBlank>
-                    <List renderHeader={() => '智能合约名称:'}>
-                        {this.nameDecorator(<InputItem clear name={"name"} placeholder="name" ref={el => this.autoFocusInst = el}/>)}
-                    </List>
 
-                    <List renderHeader={() => '智能合约abi:'}>
-                        {this.abiDecorator(<TextareaItem clear name={"abi"} placeholder={"abi"} ref={el => this.autoFocusInst = el} rows={3}/>)}
+                    <List renderHeader={() => '智能合约Abi:'}>
+                        <TextareaItem placeholder={"abi"}
+                                      rows={5}
+                                      ref={el => this.abi = el}
+                                      onChange={(value) => {
+                                          this.abi.value = value;
+                                          let abis = JSON.parse(value);
+                                          let constructor;
+                                          abis.forEach(each => {
+                                              if (each.type == "constructor" && each.inputs.length > 0) {
+                                                  constructor = each;
+                                              }
+                                          });
+
+                                          if (constructor) {
+                                              let inputs = []
+                                              constructor.inputs.forEach(item => {
+
+                                                  // inputs.push(self.props.form.getFieldDecorator(item.name, {
+                                                  //     rules: []
+                                                  // })(<InputItem>{item.name}</InputItem>));
+                                                  inputs.push(<InputItem value={"123"} {...getFieldProps(item.name)}>{item.name}</InputItem>)
+                                              })
+                                              this.setState({inputs: inputs});
+                                          } else {
+                                              this.setState({inputs: []});
+                                          }
+
+                                          // setFieldProps
+                                      }}
+                        />
+
                     </List>
+                    {
+                        this.state.inputs.length > 0 && <List renderHeader={() => '参数:'}>
+                            {this.state.inputs}
+                        </List>
+                    }
+
                     <List renderHeader={() => '智能合约Data:'}>
-                        {this.codeDecorator(<TextareaItem clear name={"code"} placeholder={"code"} ref={el => this.autoFocusInst = el} rows={3}/>)}
+                        <TextareaItem clear name={"code"} placeholder={"code"}
+                                      rows={5} ref={el => this.code = el} onChange={(value)=>{
+                                          this.code.value = value;
+                        }}/>
                     </List>
                     <WhiteSpace/>
                     <Button type="primary" onClick={() => {
                         this.submit()
-                        this.setState({contracts: this.listContracts()});
                     }}>发布</Button>
                     <WhiteSpace/>
                 </WingBlank>
@@ -83,6 +104,5 @@ class Deploy extends Component {
 }
 
 const DeployForm = createForm()(Deploy)
-
 export default DeployForm
 

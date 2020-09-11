@@ -26,7 +26,7 @@ export default class Base extends Component {
             this._init(pk);
             self.timer = setInterval(function () {
                 self._init();
-            }, 20 * 1000);
+            }, 10 * 1000);
         }
     }
 

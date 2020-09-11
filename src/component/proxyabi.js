@@ -348,5 +348,5 @@ class ProxyAbi extends Abi {
     }
 }
 
-const proxyAbi = new ProxyAbi("3bCjyu25GKK8gswNZ4nB1csVdoakGY4YknpgUAMqQTK8csQFonnkyTYhvje5a6pwF7PtKBS8Linwq1rrf59T7SN9");
+const proxyAbi = new ProxyAbi("5671Gg4XK6wpQQif4YUgH8HT2CDrmfRKrkfJ1kwEX1RKfA4m4Px1WSge7885xA4rVt7dJc6q2XMgsGXh2VwhbzVg");
 export default proxyAbi;
