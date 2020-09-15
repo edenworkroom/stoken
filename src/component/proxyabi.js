@@ -228,7 +228,6 @@ class ProxyAbi extends Abi {
 
     detail(from, tokenName, callback) {
         this.callMethod(this.contract, "detailByName", from, [tokenName], function (rets) {
-            console.log("detailByName", tokenName, rets);
             callback({
                 token: tokenName,
                 totalSupply: rets[0].toNumber(),
