@@ -53,13 +53,13 @@ class TokenList extends Base {
             <WingBlank size="md">
                 <SearchBar placeholder="币名" maxLength={8} onSubmit={value => {
                     this.setState({tokenName: value.trim()}, function () {
-                        this._init();
+                        // this._init();
                     });
 
                 }} onClear={value => {
                     if(this.state.tokenName) {
                         this.setState({tokenName: null}, function () {
-                            this._init();
+                            // this._init();
                         });
                     }
 

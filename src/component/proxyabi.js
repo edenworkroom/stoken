@@ -198,9 +198,9 @@ class ProxyAbi extends Abi {
         this.contract = serojs.callContract(abiJson, address);
     }
 
-    coinsList(from, callback) {
+    coinsList(from, start, size, callback) {
         let self = this;
-        this.callMethod(this.contract, "coinsList", from, [0, 100], function (rets) {
+        this.callMethod(this.contract, "coinsList", from, [start, start + size], function (rets) {
             let tokens = JSON.parse(rets);
             let names = [];
             tokens.forEach((item) => {
@@ -228,6 +228,7 @@ class ProxyAbi extends Abi {
 
     detail(from, tokenName, callback) {
         this.callMethod(this.contract, "detailByName", from, [tokenName], function (rets) {
+            console.log("detailByName", tokenName, rets);
             callback({
                 token: tokenName,
                 totalSupply: rets[0].toNumber(),

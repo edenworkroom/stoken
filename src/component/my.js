@@ -138,14 +138,14 @@ class My extends Base {
             <InputItem type="number" ref={el => this.supplyValue = el} placeholder="initialSupply">数量</InputItem>
             <Flex>
                 <Flex.Item>
-                    <AgreeItem defaultChecked={this.state.canMint} ref={el => this.agree = el} onChange={e => {
+                    <AgreeItem defaultChecked={!this.state.canMint} ref={el => this.agree = el} onChange={e => {
                         console.log(e.target.checked)
-                        this.setState({canMint: e.target.checked});
+                        this.setState({canMint: !e.target.checked});
                     }}>
-                        开启增发
+                        永不增发
                         <br/>
                         <a style={{fontSize: '8px', color: 'red'}}>
-                            选择不开启增发发币无增发功能,且不能在币名市场交易。
+                            开启永不增发发币无增发功能,且不能在币名市场交易。
                         </a>
                     </AgreeItem>
                 </Flex.Item>
@@ -275,7 +275,7 @@ class My extends Base {
                             <AgreeItem defaultChecked={this.state.unableMint} onChange={e => {
                                 this.setState({unableMint: e.target.checked});
                             }}>
-                                关闭增发
+                                永不增发
                             </AgreeItem>
                         </div>
                     </Tabs>
@@ -292,7 +292,7 @@ class My extends Base {
                                 pAbi.setDecimals(this.state.pk, this.state.mainPKr, this.decimalValue.state.value, catg, opt.props.ticket, opt.props.canMint);
                             } else if (opt.props.canMint) {
                                 if (this.state.unableMint) {
-                                    pAbi.setUnableMint(this.state.pk, this.state.mainPKr, opt.props.token, true, catg, opt.props.ticket);
+                                    pAbi.setUnableMint(this.state.pk, this.state.mainPKr, opt.props.token, false, catg, opt.props.ticket);
                                 }
                             }
                         }

@@ -13,7 +13,7 @@ import Help from "./component/help";
 import language from "./component/language";
 import {showPK} from "./component/common";
 import Abi from "./component/abi";
-import TokenList from "./component/list";
+import TokenList from "./component/tokenlist";
 import Tools from "./component/tool/tools";
 
 const abi = new Abi();
