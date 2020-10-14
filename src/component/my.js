@@ -138,8 +138,9 @@ class My extends Base {
             <InputItem type="number" ref={el => this.supplyValue = el} placeholder="initialSupply">数量</InputItem>
             <Flex>
                 <Flex.Item>
-                    <AgreeItem defaultChecked={!this.state.canMint} ref={el => this.agree = el} onChange={e => {
-                        console.log(e.target.checked)
+                    <AgreeItem
+                        disabled={true}
+                        defaultChecked={!this.state.canMint} ref={el => this.agree = el} onChange={e => {
                         this.setState({canMint: !e.target.checked});
                     }}>
                         永不增发
